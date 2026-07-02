@@ -66,7 +66,7 @@
                     </select>
                 </label>
 
-                <button class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-bold text-white shadow-[0_16px_30px_rgba(9,76,178,0.22)] transition hover:-translate-y-0.5">
+                <button class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-bold text-white shadow-[0_16px_30px_rgba(109,40,217,0.24)] transition hover:-translate-y-0.5">
                     <span class="material-symbols-outlined">calculate</span>
                     احسب النطاق
                 </button>

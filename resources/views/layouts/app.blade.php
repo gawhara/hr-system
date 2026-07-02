@@ -23,7 +23,6 @@
                 $navLinks = array_merge($navLinks, [
                     ['payroll.*', 'payroll.index', __('layout.nav.payroll'), 'payments'],
                     ['documents.*', 'documents.index', __('layout.nav.documents'), 'description'],
-                    ['recruitment.*', 'recruitment.index', __('layout.nav.recruitment'), 'person_search'],
                     ['performance.*', 'performance.index', __('layout.nav.performance'), 'monitoring'],
                     ['reports.*', 'reports.index', __('layout.nav.reports'), 'bar_chart'],
                     ['settings.*', 'dashboard', __('layout.nav.settings'), 'settings'],
@@ -32,10 +31,10 @@
         @endphp
 
         <div class="flex min-h-screen overflow-hidden">
-            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-[#111827] text-white shadow-[0_24px_50px_rgba(9,76,178,0.18)] lg:flex">
+            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-gradient-to-b from-[#1e1038] via-[#2e1065] to-[#581c87] text-white shadow-[0_24px_56px_rgba(88,28,135,0.28)] lg:flex">
                 <div class="flex flex-col gap-sm p-md">
                     <div class="flex items-center gap-3 py-sm">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#3366cc] to-[#094cb2] text-white shadow-[0_14px_28px_rgba(51,102,204,0.28)]">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#c084fc] via-[#8b5cf6] to-[#d946ef] text-white shadow-[0_14px_28px_rgba(192,132,252,0.28)]">
                             <span class="material-symbols-outlined fill">domain</span>
                         </div>
                         <div>
@@ -44,31 +43,11 @@
                         </div>
                     </div>
 
-                    @isset($companies)
-                        <form method="POST" action="{{ route('company-context.update') }}" class="group mt-md rounded-xl bg-white/10 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-colors hover:bg-white/15">
-                            @csrf
-                            <div class="flex items-center justify-between">
-                                <div class="flex min-w-0 items-center gap-3">
-                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-white text-primary shadow-sm">
-                                        <span class="material-symbols-outlined">corporate_fare</span>
-                                    </div>
-                                    <select name="company_id" onchange="this.form.submit()" class="min-w-0 flex-1 border-none bg-transparent p-0 font-body text-title-sm font-semibold text-white focus:ring-0">
-                                        @foreach($companies as $company)
-                                            <option class="text-on-surface" value="{{ $company->id }}" @selected($user->current_company_id === $company->id)>
-                                                {{ app()->getLocale() === 'ar' ? $company->name_ar : ($company->name_en ?: $company->name_ar) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <span class="material-symbols-outlined text-white/55 transition-colors group-hover:text-white">unfold_more</span>
-                            </div>
-                        </form>
-                    @endisset
                 </div>
 
                 <nav class="custom-scrollbar flex-1 space-y-1 overflow-y-auto px-sm py-md">
                     @foreach($navLinks as [$pattern, $route, $label, $icon])
-                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'bg-white font-bold text-primary shadow-[0_16px_30px_rgba(255,255,255,0.12)]' : 'text-white/68 hover:bg-white/10 hover:text-white' }}">
+                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'bg-white font-bold text-primary shadow-[0_16px_34px_rgba(216,180,254,0.22)]' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
                             <span class="material-symbols-outlined {{ request()->routeIs($pattern) ? 'fill' : '' }}">{{ $icon }}</span>
                             <span class="text-body-md">{{ $label }}</span>
                         </a>
@@ -91,10 +70,10 @@
             </aside>
 
             <main class="flex h-screen flex-1 flex-col overflow-hidden lg:ms-sidebar-width">
-                <header class="sticky top-0 z-40 flex min-h-[76px] w-full items-center justify-between border-b border-outline-variant/15 bg-white/92 px-md py-3 shadow-[0_18px_44px_rgba(17,24,39,0.06)] backdrop-blur-xl">
+                <header class="sticky top-0 z-40 flex min-h-[76px] w-full items-center justify-between border-b border-outline-variant/15 bg-white/92 px-md py-3 shadow-[0_18px_44px_rgba(88,28,135,0.08)] backdrop-blur-xl">
                     <div class="flex min-w-0 flex-1 items-center justify-start">
                         <div class="relative hidden w-full max-w-md md:block">
-                            <input class="h-12 w-full rounded-full border border-outline-variant/25 bg-surface-container-lowest py-2 ps-12 pe-5 text-body-sm text-on-surface shadow-[0_10px_26px_rgba(17,24,39,0.04)] transition placeholder:text-on-surface-variant/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10" placeholder="{{ __('layout.search_placeholder') }}" type="text">
+                            <input class="h-12 w-full rounded-full border border-outline-variant/25 bg-surface-container-lowest py-2 ps-12 pe-5 text-body-sm text-on-surface shadow-[0_10px_26px_rgba(88,28,135,0.05)] transition placeholder:text-on-surface-variant/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10" placeholder="{{ __('layout.search_placeholder') }}" type="text">
                             <span class="material-symbols-outlined absolute start-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
                         </div>
                     </div>
@@ -170,7 +149,7 @@
                             </form>
                         </div>
 
-                        <div class="hidden items-center gap-3 rounded-full border border-outline-variant/20 bg-white py-1.5 ps-1.5 pe-4 shadow-[0_10px_26px_rgba(17,24,39,0.05)] transition hover:border-primary/30 sm:flex">
+                        <div class="hidden items-center gap-3 rounded-full border border-outline-variant/20 bg-white py-1.5 ps-1.5 pe-4 shadow-[0_10px_26px_rgba(88,28,135,0.06)] transition hover:border-primary/30 sm:flex">
                             <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-primary-fixed text-sm font-black text-primary">
                                 {{ mb_substr($user->name, 0, 1) }}
                             </div>
@@ -187,7 +166,7 @@
                 </div>
             </main>
 
-            <nav class="fixed bottom-0 start-0 end-0 z-50 grid grid-cols-4 border-t border-outline-variant bg-surface-container-lowest py-2 shadow-[0_-4px_12px_rgba(15,76,129,0.08)] lg:hidden">
+            <nav class="fixed bottom-0 start-0 end-0 z-50 grid grid-cols-4 border-t border-outline-variant bg-surface-container-lowest/95 py-2 shadow-[0_-8px_22px_rgba(88,28,135,0.12)] backdrop-blur-xl lg:hidden">
                 <a href="{{ route('dashboard') }}" class="flex flex-col items-center {{ request()->routeIs('dashboard') ? 'font-bold text-primary' : 'text-on-surface-variant' }}"><span class="material-symbols-outlined {{ request()->routeIs('dashboard') ? 'fill' : '' }}">dashboard</span><span class="text-[10px]">{{ __('layout.nav.home') }}</span></a>
                 <a href="{{ route('employees.index') }}" class="flex flex-col items-center {{ request()->routeIs('employees.*') ? 'font-bold text-primary' : 'text-on-surface-variant' }}"><span class="material-symbols-outlined {{ request()->routeIs('employees.*') ? 'fill' : '' }}">groups</span><span class="text-[10px]">{{ __('layout.nav.employees') }}</span></a>
                 @if($isHr)

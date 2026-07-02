@@ -126,6 +126,12 @@ class EmployeeProfileTabsTest extends TestCase
         $response = $this->actingAs($admin)->get(route('employees.index'));
 
         $response->assertOk();
+        $response->assertSee('عرض موظفي الشركة');
+        $response->assertDontSee('اكتمال الملف');
+
+        $response = $this->actingAs($admin)->get(route('employees.index', ['company_id' => 1]));
+
+        $response->assertOk();
         $response->assertSee('اكتمال الملف');
     }
 }

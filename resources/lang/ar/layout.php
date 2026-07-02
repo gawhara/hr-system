@@ -18,7 +18,6 @@ return [
         'leaves' => 'الإجازات',
         'payroll' => 'الرواتب',
         'documents' => 'الوثائق',
-        'recruitment' => 'التوظيف',
         'performance' => 'الأداء',
         'reports' => 'التقارير',
         'settings' => 'الإعدادات',

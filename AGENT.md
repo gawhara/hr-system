@@ -664,6 +664,37 @@ Architecture-consistent decisions made during the build, newest batch
 first. Follow these patterns when extending the system; don't reinvent
 them per module.
 
+### 2026-07-02 — UI branding, navigation, and employee company gateway
+
+* **Branding:** visible app branding is now **SMARS HR**. `APP_NAME`
+is set to `SMARS HR`; the login page and copyright text use the same
+name. Do not reintroduce `Horizon Enterprise` or `HR ERP` in visible UI.
+* **Visual direction:** the active UI theme is a polished purple-gradient
+enterprise style with Arabic-first RTL layout. Sidebar, login,
+dashboard, cards, buttons, form controls, and Nitaqat calculator should
+continue using the shared purple surface/gradient language in
+`resources/css/app.css`.
+* **Top navbar restored:** the authenticated layout has the top navbar
+again, including search, Nitaqat calculator shortcut, notifications,
+language switch, and user badge. The earlier sidebar company selector
+remains removed.
+* **Recruitment removed:** the Recruitment / Talent acquisition module
+is intentionally removed from navigation and routing. `/recruitment`
+should stay unavailable unless the business explicitly asks to rebuild
+that module.
+* **Dashboard layout:** the main dashboard is focused on the four group
+companies as company dashboard cards, with no extra explanatory blocks
+outside the cards.
+* **Employees entry flow:** `/employees` is now a company-selection
+gateway only. It shows the four company cards in a centered 2x2 grid;
+clicking a card opens the filtered employee directory via
+`/employees?company_id={id}`. The employee table, filters, and profile
+completion ring appear only after a company has been selected.
+* **Network dev access:** current LAN dev server is commonly run as
+`php artisan serve --host=0.0.0.0 --port=8011`, reachable on the local
+network at `http://192.168.10.92:8011/` while that machine keeps the
+same IPv4 address.
+
 ### 2026-07-02 — Foundation hardening + Phase 2/3 build
 
 * **Offline strategy: A (branch-local server + central sync) — DECIDED
@@ -740,4 +771,3 @@ http://127.0.0.1:8000/dashboard
 D:\\xampp82\\htdocs\\hr-system
 
 D:\\xampp82
-

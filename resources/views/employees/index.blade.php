@@ -3,37 +3,91 @@
 @section('title', 'الموظفون')
 
 @section('content')
-    <div class="space-y-8">
-        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-                <p class="font-label text-xs font-bold uppercase tracking-[0.25em] text-tertiary">People directory</p>
-                <h2 class="mt-2 font-headline text-display-lg font-bold text-primary">دليل الموظفين</h2>
-                <p class="mt-2 text-on-surface-variant">إدارة بيانات الموظفين عبر جميع فروع وشركات المجموعة.</p>
-            </div>
-            @can('manage-employees')
-                <a href="{{ route('employees.create') }}" class="stitch-btn-primary flex items-center gap-2 px-6 py-3">
-                    <span class="material-symbols-outlined">person_add</span>
-                    <span>إضافة موظف جديد</span>
-                </a>
-            @endcan
-        </div>
+    @php
+        $selectedCompany = $selectedCompanyId ? $companies->firstWhere('id', (int) $selectedCompanyId) : null;
+        $companyCardTones = [
+            ['from' => '#2e1065', 'via' => '#6d28d9', 'to' => '#d946ef'],
+            ['from' => '#3b0764', 'via' => '#7c3aed', 'to' => '#a21caf'],
+            ['from' => '#1e1b4b', 'via' => '#6d28d9', 'to' => '#c026d3'],
+            ['from' => '#581c87', 'via' => '#8b5cf6', 'to' => '#db2777'],
+        ];
 
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-4">
-            @foreach([
-                ['إجمالي الموظفين', $companies->sum('employees_count'), 'badge'],
-                ['تحت التجربة', $dataQuality['probation'], 'hourglass_top'],
-                ['إقامات منتهية', $dataQuality['expired_iqama'], 'gpp_bad'],
-                ['ملفات غير مكتملة', $dataQuality['incomplete'], 'rule'],
-            ] as [$label, $value, $icon])
-                <div class="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(27,28,29,0.035)]">
-                    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-fixed text-primary">
-                        <span class="material-symbols-outlined">{{ $icon }}</span>
-                    </div>
-                    <p class="text-sm text-on-surface-variant">{{ $label }}</p>
-                    <h4 class="mt-1 font-headline text-3xl font-bold text-primary">{{ number_format($value) }}</h4>
+        $companyLogo = function ($company) {
+            $name = mb_strtolower($company->name_en.' '.$company->name_ar);
+
+            return match (true) {
+                str_contains($name, 'factory') || str_contains($name, 'مصنع') => 'images/companies/amniat-factory.png',
+                str_contains($name, 'construction') || str_contains($name, 'مقاولات') || str_contains($name, 'المقاولات') => 'images/companies/ptc-construction.png',
+                str_contains($name, 'ptc') || str_contains($name, 'تجارة') || str_contains($name, 'التجارة') => 'images/companies/ptc.png',
+                default => 'images/companies/amniat.png',
+            };
+        };
+    @endphp
+
+    <div class="space-y-8">
+        @if($selectedCompanyId)
+            <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                    <p class="font-label text-xs font-bold uppercase tracking-[0.25em] text-tertiary">People directory</p>
+                    <h2 class="mt-2 font-headline text-display-lg font-bold text-primary">موظفو {{ $selectedCompany?->name_ar ?? 'الشركة' }}</h2>
+                    <p class="mt-2 text-on-surface-variant">عرض وإدارة ملفات الموظفين الخاصة بهذه الشركة فقط.</p>
                 </div>
-            @endforeach
-        </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('employees.index') }}" class="rounded-xl border border-primary/15 bg-white/80 px-5 py-3 text-sm font-black text-primary shadow-[0_12px_24px_rgba(88,28,135,0.08)] transition hover:-translate-y-0.5 hover:bg-primary-fixed">
+                        كل الشركات
+                    </a>
+                    @can('manage-employees')
+                        <a href="{{ route('employees.create') }}" class="stitch-btn-primary flex items-center gap-2 px-6 py-3">
+                            <span class="material-symbols-outlined">person_add</span>
+                            <span>إضافة موظف جديد</span>
+                        </a>
+                    @endcan
+                </div>
+            </div>
+        @endif
+
+        @if(! $selectedCompanyId)
+            <div class="flex min-h-[calc(100vh-11rem)] items-center justify-center">
+                <div class="mx-auto grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
+                    @foreach($companies as $index => $company)
+                        @php
+                            $tone = $companyCardTones[$index % count($companyCardTones)];
+                            $companyUrl = route('employees.index', ['company_id' => $company->id]);
+                        @endphp
+
+                        <a href="{{ $companyUrl }}"
+                           class="group relative isolate min-h-52 overflow-hidden rounded-3xl border border-white/70 bg-white/82 p-1 shadow-[0_18px_40px_rgba(88,28,135,0.10)] ring-1 ring-outline-variant/20 backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_52px_rgba(88,28,135,0.16)]">
+                            <div class="absolute inset-0 -z-10 opacity-0 transition group-hover:opacity-100" style="background: radial-gradient(circle at 20% 10%, {{ $tone['to'] }}24, transparent 30%);"></div>
+
+                            <div class="flex h-full flex-col overflow-hidden rounded-[1.35rem] bg-white/86">
+                                <div class="h-2" style="background: linear-gradient(to left, {{ $tone['from'] }}, {{ $tone['via'] }}, {{ $tone['to'] }});"></div>
+                                <div class="flex flex-1 flex-col p-5">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="min-w-0">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-primary-fixed px-2.5 py-1 text-[11px] font-black text-primary">
+                                                <span class="material-symbols-outlined text-sm">corporate_fare</span>
+                                                عرض موظفي الشركة
+                                            </span>
+                                            <h3 class="mt-3 truncate text-lg font-black text-on-surface">{{ $company->name_ar }}</h3>
+                                            <p class="mt-0.5 truncate text-xs font-bold uppercase tracking-wide text-on-surface-variant">{{ $company->name_en }}</p>
+                                        </div>
+
+                                        <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-2xl border border-outline-variant/25 bg-white p-3 shadow-[0_12px_24px_rgba(88,28,135,0.08)]">
+                                            <img src="{{ asset($companyLogo($company)) }}" alt="{{ $company->name_ar }}" class="max-h-11 max-w-full object-contain">
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto flex items-center justify-between rounded-2xl bg-surface-container-low px-4 py-3">
+                                        <span class="text-xs font-bold text-on-surface-variant">عدد الموظفين</span>
+                                        <strong class="font-headline text-2xl font-black text-primary">{{ number_format($company->employees_count) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @else
 
         <div class="flex flex-col gap-6 xl:flex-row">
             <aside class="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(27,28,29,0.035)] xl:w-80 xl:shrink-0">
@@ -165,5 +219,6 @@
                 </div>
             </section>
         </div>
+        @endif
     </div>
 @endsection

@@ -18,7 +18,6 @@ return [
         'leaves' => 'Leave Requests',
         'payroll' => 'Payroll',
         'documents' => 'Documents',
-        'recruitment' => 'Recruitment',
         'performance' => 'Performance',
         'reports' => 'Reports',
         'settings' => 'Settings',

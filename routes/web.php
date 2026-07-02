@@ -62,6 +62,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/payroll/{payroll}/transition', [PayrollController::class, 'transition'])->name('payroll.transition');
     Route::post('/payroll/{payroll}/adjustment', [PayrollController::class, 'createAdjustment'])->name('payroll.adjustment');
     Route::get('/reports', ReportsController::class)->name('reports.index');
-    Route::view('/recruitment', 'recruitment.index')->name('recruitment.index');
     Route::view('/performance', 'performance.index')->name('performance.index');
 });

@@ -33,46 +33,46 @@
     --font-body-md: 'Inter', 'Cairo', sans-serif;
     --font-body-sm: 'Inter', 'Cairo', sans-serif;
     --font-label-caps: 'Public Sans', 'Inter', 'Cairo', sans-serif;
-    --color-surface: #faf9fa;
-    --color-background: #faf9fa;
-    --color-on-background: #1b1c1d;
-    --color-on-surface: #1b1c1d;
-    --color-on-surface-variant: #434653;
+    --color-surface: #fbf7ff;
+    --color-background: #fbf7ff;
+    --color-on-background: #1d1730;
+    --color-on-surface: #1d1730;
+    --color-on-surface-variant: #5b5370;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f5f3f4;
-    --color-surface-container: #efedee;
-    --color-surface-container-high: #e9e8e9;
-    --color-surface-container-highest: #e3e2e3;
-    --color-surface-dim: #dbdadb;
-    --color-outline: #737784;
-    --color-outline-variant: #c3c6d5;
-    --color-primary: #094cb2;
+    --color-surface-container-low: #f6efff;
+    --color-surface-container: #efe4ff;
+    --color-surface-container-high: #e8dcff;
+    --color-surface-container-highest: #e2d4ff;
+    --color-surface-dim: #ddd4ec;
+    --color-outline: #776b91;
+    --color-outline-variant: #cec3df;
+    --color-primary: #6d28d9;
     --color-on-primary: #ffffff;
-    --color-primary-container: #3366cc;
-    --color-on-primary-container: #e7ebff;
-    --color-primary-fixed: #d9e2ff;
-    --color-primary-fixed-dim: #b1c5ff;
-    --color-on-primary-fixed: #001946;
-    --color-on-primary-fixed-variant: #00419d;
-    --color-secondary: #5a5f63;
+    --color-primary-container: #8b5cf6;
+    --color-on-primary-container: #fbf7ff;
+    --color-primary-fixed: #ede9fe;
+    --color-primary-fixed-dim: #ddd6fe;
+    --color-on-primary-fixed: #2e1065;
+    --color-on-primary-fixed-variant: #5b21b6;
+    --color-secondary: #69547f;
     --color-on-secondary: #ffffff;
-    --color-secondary-container: #dfe3e8;
-    --color-on-secondary-container: #606569;
-    --color-secondary-fixed: #dfe3e8;
-    --color-secondary-fixed-dim: #c2c7cc;
-    --color-on-secondary-fixed: #171c20;
-    --color-on-secondary-fixed-variant: #42474b;
-    --color-tertiary: #6d5e00;
+    --color-secondary-container: #eadcf8;
+    --color-on-secondary-container: #4f3f64;
+    --color-secondary-fixed: #eadcf8;
+    --color-secondary-fixed-dim: #d8c4ee;
+    --color-on-secondary-fixed: #21162c;
+    --color-on-secondary-fixed-variant: #4f3f64;
+    --color-tertiary: #a21caf;
     --color-on-tertiary: #ffffff;
-    --color-tertiary-container: #bfab49;
-    --color-on-tertiary-container: #4a3f00;
-    --color-tertiary-fixed: #f9e37a;
-    --color-tertiary-fixed-dim: #dcc661;
-    --color-on-tertiary-fixed: #211b00;
-    --color-on-tertiary-fixed-variant: #524600;
-    --color-inverse-surface: #303031;
-    --color-inverse-on-surface: #f2f0f1;
-    --color-inverse-primary: #b1c5ff;
+    --color-tertiary-container: #f5d0fe;
+    --color-on-tertiary-container: #701a75;
+    --color-tertiary-fixed: #fae8ff;
+    --color-tertiary-fixed-dim: #f0abfc;
+    --color-on-tertiary-fixed: #4a044e;
+    --color-on-tertiary-fixed-variant: #86198f;
+    --color-inverse-surface: #2a2238;
+    --color-inverse-on-surface: #f7f2ff;
+    --color-inverse-primary: #c4b5fd;
     --color-error: #ba1a1a;
     --color-on-error: #ffffff;
     --color-error-container: #ffdad6;
@@ -91,13 +91,18 @@
     --font-size-label-caps: 12px;
     --radius-xl: 0.75rem;
     --radius-lg: 0.5rem;
+    --shadow-purple-soft: 0 22px 48px rgba(109, 40, 217, 0.12);
+    --shadow-purple-card: 0 18px 36px rgba(46, 16, 101, 0.08);
 }
 
 @layer base {
     body {
         font-family: 'Inter', 'Cairo', ui-sans-serif, system-ui, sans-serif;
-        background: #faf9fa;
-        color: #1b1c1d;
+        background:
+            radial-gradient(circle at 18% 8%, rgba(168, 85, 247, 0.13), transparent 28%),
+            radial-gradient(circle at 88% 12%, rgba(217, 70, 239, 0.12), transparent 30%),
+            linear-gradient(180deg, #fbf7ff 0%, #f8f3ff 48%, #ffffff 100%);
+        color: #1d1730;
     }
 
     .material-symbols-outlined {
@@ -128,17 +133,17 @@
 
 @layer components {
     .glass-card {
-        background: rgba(255, 255, 255, 0.78);
-        border: 1px solid rgba(195, 198, 213, 0.15);
-        box-shadow: 0 24px 40px rgba(27, 28, 29, 0.04);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(251, 247, 255, 0.72));
+        border: 1px solid rgba(206, 195, 223, 0.48);
+        box-shadow: var(--shadow-purple-card);
+        backdrop-filter: blur(22px);
     }
 
     .stitch-card {
-        background: #ffffff;
-        border: 1px solid rgba(195, 198, 213, 0.15);
+        background: linear-gradient(145deg, #ffffff, #fbf7ff);
+        border: 1px solid rgba(206, 195, 223, 0.42);
         border-radius: 0.75rem;
-        box-shadow: 0 18px 36px rgba(27, 28, 29, 0.035);
+        box-shadow: var(--shadow-purple-card);
     }
 
     .hide-scrollbar::-webkit-scrollbar {
@@ -155,7 +160,7 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #c2c7d1;
+        background: #c4b5fd;
         border-radius: 10px;
     }
 
@@ -169,43 +174,56 @@
         gap: 0.75rem;
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
-        color: #434653;
+        color: #5b5370;
         transition: all 160ms ease;
     }
 
     .stitch-nav-link:hover {
-        background: #e9e8e9;
-        color: #094cb2;
+        background: #efe4ff;
+        color: #6d28d9;
     }
 
     .stitch-nav-link-active {
-        background: #dfe3e8;
-        color: #094cb2;
+        background: #ede9fe;
+        color: #6d28d9;
         font-weight: 700;
     }
 
     .stitch-btn-primary {
         border-radius: 0.75rem;
-        background: linear-gradient(135deg, #094cb2, #3366cc);
+        background: linear-gradient(135deg, #6d28d9, #8b5cf6 52%, #d946ef);
         color: #fff;
         font-weight: 700;
-        box-shadow: 0 10px 24px rgba(0, 53, 95, 0.16);
+        box-shadow: 0 16px 30px rgba(109, 40, 217, 0.24);
         transition: all 160ms ease;
     }
 
     .stitch-btn-primary:hover {
-        background: #0f4c81;
+        transform: translateY(-1px);
+        box-shadow: 0 20px 36px rgba(109, 40, 217, 0.30);
     }
 
     .stitch-input {
         border-radius: 0.5rem;
-        border: 1px solid #c2c7d1;
-        background: #ffffff;
+        border: 1px solid #d8c4ee;
+        background: rgba(255, 255, 255, 0.9);
+        transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
 
     .stitch-input:focus {
-        border-color: #00355f;
-        box-shadow: 0 0 0 2px rgba(0, 53, 95, 0.16);
+        border-color: #8b5cf6;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
         outline: none;
+    }
+}
+
+@layer utilities {
+    .bg-primary {
+        background: linear-gradient(135deg, #6d28d9, #8b5cf6 52%, #d946ef);
+    }
+
+    .bg-primary-container {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
     }
 }
