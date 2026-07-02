@@ -1,0 +1,211 @@
+@import 'tailwindcss';
+@import '@fontsource/cairo/400.css';
+@import '@fontsource/cairo/500.css';
+@import '@fontsource/cairo/600.css';
+@import '@fontsource/cairo/700.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/noto-serif/600.css';
+@import '@fontsource/noto-serif/700.css';
+@import '@fontsource/public-sans/500.css';
+@import '@fontsource/public-sans/700.css';
+@import 'material-symbols/outlined.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+
+@theme {
+    --font-sans: 'Inter', 'Cairo', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-headline: 'Noto Serif', 'Cairo', serif;
+    --font-display: 'Noto Serif', 'Cairo', serif;
+    --font-body: 'Inter', 'Cairo', sans-serif;
+    --font-label: 'Public Sans', 'Inter', 'Cairo', sans-serif;
+    --font-title-sm: 'Inter', 'Cairo', sans-serif;
+    --font-display-lg: 'Noto Serif', 'Cairo', serif;
+    --font-display-lg-mobile: 'Noto Serif', 'Cairo', serif;
+    --font-headline-md: 'Noto Serif', 'Cairo', serif;
+    --font-body-md: 'Inter', 'Cairo', sans-serif;
+    --font-body-sm: 'Inter', 'Cairo', sans-serif;
+    --font-label-caps: 'Public Sans', 'Inter', 'Cairo', sans-serif;
+    --color-surface: #faf9fa;
+    --color-background: #faf9fa;
+    --color-on-background: #1b1c1d;
+    --color-on-surface: #1b1c1d;
+    --color-on-surface-variant: #434653;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f5f3f4;
+    --color-surface-container: #efedee;
+    --color-surface-container-high: #e9e8e9;
+    --color-surface-container-highest: #e3e2e3;
+    --color-surface-dim: #dbdadb;
+    --color-outline: #737784;
+    --color-outline-variant: #c3c6d5;
+    --color-primary: #094cb2;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #3366cc;
+    --color-on-primary-container: #e7ebff;
+    --color-primary-fixed: #d9e2ff;
+    --color-primary-fixed-dim: #b1c5ff;
+    --color-on-primary-fixed: #001946;
+    --color-on-primary-fixed-variant: #00419d;
+    --color-secondary: #5a5f63;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #dfe3e8;
+    --color-on-secondary-container: #606569;
+    --color-secondary-fixed: #dfe3e8;
+    --color-secondary-fixed-dim: #c2c7cc;
+    --color-on-secondary-fixed: #171c20;
+    --color-on-secondary-fixed-variant: #42474b;
+    --color-tertiary: #6d5e00;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #bfab49;
+    --color-on-tertiary-container: #4a3f00;
+    --color-tertiary-fixed: #f9e37a;
+    --color-tertiary-fixed-dim: #dcc661;
+    --color-on-tertiary-fixed: #211b00;
+    --color-on-tertiary-fixed-variant: #524600;
+    --color-inverse-surface: #303031;
+    --color-inverse-on-surface: #f2f0f1;
+    --color-inverse-primary: #b1c5ff;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --spacing-sidebar-width: 280px;
+    --spacing-md: 24px;
+    --spacing-lg: 40px;
+    --spacing-sm: 12px;
+    --spacing-xs: 4px;
+    --spacing-xl: 64px;
+    --font-size-display-lg: 36px;
+    --font-size-headline-md: 24px;
+    --font-size-title-sm: 18px;
+    --font-size-body-md: 16px;
+    --font-size-body-sm: 14px;
+    --font-size-label-caps: 12px;
+    --radius-xl: 0.75rem;
+    --radius-lg: 0.5rem;
+}
+
+@layer base {
+    body {
+        font-family: 'Inter', 'Cairo', ui-sans-serif, system-ui, sans-serif;
+        background: #faf9fa;
+        color: #1b1c1d;
+    }
+
+    .material-symbols-outlined {
+        direction: ltr;
+        display: inline-block;
+        font-family: 'Material Symbols Outlined';
+        font-feature-settings: 'liga';
+        font-style: normal;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-weight: normal;
+        letter-spacing: normal;
+        line-height: 1;
+        text-transform: none;
+        white-space: nowrap;
+        word-wrap: normal;
+    }
+
+    .material-symbols-outlined.fill,
+    .material-symbols-outlined[style*="FILL"] {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    [dir="rtl"] input,
+    [dir="rtl"] select {
+        text-align: right;
+    }
+}
+
+@layer components {
+    .glass-card {
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(195, 198, 213, 0.15);
+        box-shadow: 0 24px 40px rgba(27, 28, 29, 0.04);
+        backdrop-filter: blur(20px);
+    }
+
+    .stitch-card {
+        background: #ffffff;
+        border: 1px solid rgba(195, 198, 213, 0.15);
+        border-radius: 0.75rem;
+        box-shadow: 0 18px 36px rgba(27, 28, 29, 0.035);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c2c7d1;
+        border-radius: 10px;
+    }
+
+    .chart-bar-transition {
+        transition: height 1s ease-in-out;
+    }
+
+    .stitch-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        color: #434653;
+        transition: all 160ms ease;
+    }
+
+    .stitch-nav-link:hover {
+        background: #e9e8e9;
+        color: #094cb2;
+    }
+
+    .stitch-nav-link-active {
+        background: #dfe3e8;
+        color: #094cb2;
+        font-weight: 700;
+    }
+
+    .stitch-btn-primary {
+        border-radius: 0.75rem;
+        background: linear-gradient(135deg, #094cb2, #3366cc);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 10px 24px rgba(0, 53, 95, 0.16);
+        transition: all 160ms ease;
+    }
+
+    .stitch-btn-primary:hover {
+        background: #0f4c81;
+    }
+
+    .stitch-input {
+        border-radius: 0.5rem;
+        border: 1px solid #c2c7d1;
+        background: #ffffff;
+    }
+
+    .stitch-input:focus {
+        border-color: #00355f;
+        box-shadow: 0 0 0 2px rgba(0, 53, 95, 0.16);
+        outline: none;
+    }
+}
