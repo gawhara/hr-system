@@ -664,6 +664,82 @@ Architecture-consistent decisions made during the build, newest batch
 first. Follow these patterns when extending the system; don't reinvent
 them per module.
 
+### 2026-07-04 — PRD Employee Module (Bayzat reference) adoption + GitHub backup
+
+Outcome of reviewing `PRD_Employee_Module_HRMS_Bayzat_Reference_EN.docx`
+against this architecture — what was adopted, adapted, or rejected:
+
+* **REJECTED — 1:1 satellite tables** (`employee_personal_infos`,
+`employee_job_infos`, `employee_salaries`, …). The flat `employees`
+table stays: splitting would break sync identity, encryption/hash
+columns, and audit wiring for zero functional gain. The PRD's groupings
+live as profile tabs, not tables.
+* **ADOPTED — the bilingual field workbook is mirrored 1:1 on
+`employees`**, including monthly figure columns (overtime, deductions,
+GOSI items, cash/bank-transfer splits, `remaining_salary`) and legacy
+`employment_status` / `branch_text` / `bank` / `job_title` free-text
+columns. These are the spreadsheet-compatible master-data entry surface;
+`payroll_items` remains the authoritative per-cycle payroll record.
+Don't remove these columns to "normalize" — imports depend on them.
+* **Unified 7-value employee status** (`active, inactive, probation,
+on_leave, suspended, resigned, terminated` — `Employee::STATUSES`) with
+Arabic labels in `STATUS_LABELS_AR`. Status changes go through
+`Employee::changeStatus()` (reason + actor recorded in
+`employee_status_histories`, syncable) via `POST /employees/{id}/status`
+— never a bare field edit. Deactivating states require a reason.
+The legacy `employment_status` column coexists for spreadsheet
+compatibility but the unified `status` drives all logic.
+* **`Employee::EMPLOYED_STATUSES`** (`active, probation, on_leave,
+suspended`) defines who counts for Nitaqat/headcount via
+`scopeEmployed()` — PLACEHOLDER judgment, verify against official
+GOSI/Nitaqat counting rules.
+* **New profile fields:** `marital_status`, `address`,
+`emergency_contact_name/phone`, `manager_id` (direct manager, same
+company, not self), `work_location`, `probation_end_date`,
+`avatar_path`. Contract vocabulary is `fixed / indefinite / training /
+temporary` (`Employee::CONTRACT_TYPES`); `open` was renamed
+`indefinite` everywhere.
+* **Weighted profile completion (PRD §8):** sections 20/20/20/15/15/10
+(basic/personal/work/contract/salary/required-documents), computed in
+`Employee::profileCompletion()` and **stored** in
+`employees.profile_completion` for SQL filtering/stat cards. Recomputed
+on employee save; contracts/documents changes trigger
+`recomputeProfileCompletionQuietly()` (quiet update — derived data must
+not re-dirty sync state or the audit log). Threshold bands via
+`Employee::completionBand()` (<50 / <75 / <90 / ≥90).
+* **Validation additions:** minimum age 15 (birth_date), manager must
+be same-company and not self, `bank_name` required with IBAN,
+probation end after contract start.
+* **Directory data-quality cards** (probation / expired iqama /
+incomplete <75%) and branch/department/status/contract-type filters on
+the employee list.
+* **Deferred from the PRD:** Excel import/export (maatwebsite/excel not
+yet installed), assets module, admin REST API (§14 — Sanctum is
+Phase 5), hr_officer/viewer/department_manager roles.
+* **Backup:** the canonical off-machine backup is the GitHub remote
+`https://github.com/gawhara/hr-system` (`origin`, branch `main`). Keep
+it current after significant milestones.
+
+### 2026-07-04 — Payslips + Mudad salary file export
+
+* **Payslips are print-ready HTML, not server-generated PDF.** Route
+`GET /payroll/{payroll}/items/{item}/payslip` renders a standalone A4
+RTL bilingual (ar primary / en secondary) payslip view
+(`payroll/payslip.blade.php`); PDF is produced via browser print. This
+was chosen deliberately: dompdf's Arabic shaping is unreliable, and a
+dependency-free HTML view works on offline branch nodes. If server-side
+PDFs are later needed (e.g. email attachments), add `mpdf/mpdf` (good
+Arabic support) — not dompdf.
+* **Payslip access:** payroll staff (`view-payroll`, scoped to current
+company); employee self-service sees **own** payslips of **locked runs
+only** — draft/under-review figures are never shown to employees.
+Unlocked runs render with a "غير نهائي — PRELIMINARY" watermark for staff.
+* **Mudad export** (`GET /payroll/{payroll}/export/mudad`): WPS-style CSV
+(UTF-8 BOM), `manage-payroll` only, **locked runs only**. Every export is
+written to the activity log (`event: mudad_export`) since it contains
+IBANs and salaries. The column layout is a PLACEHOLDER shape — verify
+against the official Mudad file specification before production upload.
+
 ### 2026-07-02 — UI branding, navigation, and employee company gateway
 
 * **Branding:** visible app branding is now **SMARS HR**. `APP_NAME`
