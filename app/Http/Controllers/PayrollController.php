@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PayrollCycle;
+use App\Models\PayrollItem;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PayrollController extends Controller
 {
@@ -81,6 +83,100 @@ class PayrollController extends Controller
         return redirect()
             ->route('payroll.show', $payroll)
             ->with('status', 'تم تحديث حالة مسير الرواتب.');
+    }
+
+    /**
+     * Print-ready A4 payslip for a single payroll item (browser print → PDF).
+     *
+     * Access: payroll staff scoped to their current company, or the employee
+     * themself — but self-service only sees payslips of LOCKED runs, since
+     * draft/under-review figures are not official.
+     */
+    public function payslip(Request $request, PayrollCycle $payroll, PayrollItem $item)
+    {
+        abort_unless($item->payroll_cycle_id === $payroll->id, 404);
+
+        $user = $request->user();
+        $isPayrollStaff = $user->can('view-payroll')
+            && $payroll->company_id === $user->current_company_id;
+        $isSelf = $user->employee && $user->employee->id === $item->employee_id;
+
+        if (! $isPayrollStaff) {
+            abort_unless($isSelf && $payroll->isLocked(), 403);
+        }
+
+        $payroll->load(['company', 'branch', 'parentCycle']);
+        $item->load(['employee.department', 'employee.position', 'employee.branch']);
+
+        return view('payroll.payslip', ['cycle' => $payroll, 'item' => $item]);
+    }
+
+    /**
+     * Mudad/WPS-style salary file for a LOCKED run.
+     *
+     * PLACEHOLDER FORMAT — column set follows the common WPS salary-file
+     * shape (employee id, iqama, bank, IBAN, salary breakdown, net) but MUST
+     * be verified against the official Mudad file specification before being
+     * uploaded to Mudad in production (AGENT.md guiding principle #6).
+     */
+    public function exportMudad(Request $request, PayrollCycle $payroll): StreamedResponse
+    {
+        abort_unless($request->user()->can('manage-payroll'), 403);
+        abort_unless($request->user()->canAccessCompany($payroll->company_id), 403);
+        abort_unless($payroll->isLocked(), 422, 'تصدير ملف مداد متاح فقط للمسيرات المقفلة.');
+
+        $payroll->load(['company', 'items.employee']);
+
+        // Exporting IBANs + salary figures is sensitive — always audited.
+        activity('payroll')
+            ->performedOn($payroll)
+            ->causedBy($request->user())
+            ->event('mudad_export')
+            ->log('Mudad salary file exported');
+
+        $filename = sprintf(
+            'mudad_wps_%s_%04d_%02d_run%d.csv',
+            $payroll->company?->name_en ? str_replace(' ', '_', strtolower($payroll->company->name_en)) : $payroll->company_id,
+            $payroll->year,
+            $payroll->month,
+            $payroll->run_sequence ?? 0,
+        );
+
+        return response()->streamDownload(function () use ($payroll) {
+            $out = fopen('php://output', 'w');
+
+            // UTF-8 BOM so Arabic names open correctly in Excel.
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, [
+                'employee_code', 'national_id', 'name_ar', 'name_en',
+                'bank_name', 'iban',
+                'basic_salary', 'housing_allowance', 'other_earnings',
+                'total_deductions', 'net_salary',
+            ]);
+
+            foreach ($payroll->items as $item) {
+                $employee = $item->employee;
+
+                fputcsv($out, [
+                    $employee?->employee_code,
+                    $employee?->national_id,
+                    $employee?->name_ar,
+                    $employee?->name_en,
+                    $employee?->bank_name,
+                    $employee?->iban,
+                    number_format((float) $item->basic_salary, 2, '.', ''),
+                    number_format((float) $item->housing_allowance, 2, '.', ''),
+                    number_format((float) ($item->transportation_allowance + $item->other_allowances + $item->overtime + $item->previous_dues), 2, '.', ''),
+                    number_format((float) $item->total_deductions, 2, '.', ''),
+                    number_format((float) $item->net_salary, 2, '.', ''),
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function createAdjustment(Request $request, PayrollCycle $payroll)

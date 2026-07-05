@@ -7,7 +7,7 @@
     <title>{{ config('app.name') }}@hasSection('title') - @yield('title')@endif</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-background text-on-background">
+<body class="app-shell min-h-screen bg-background text-on-background antialiased">
     @auth
         @php
             $user = auth()->user();
@@ -31,10 +31,10 @@
         @endphp
 
         <div class="flex min-h-screen overflow-hidden">
-            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-gradient-to-b from-[#1e1038] via-[#2e1065] to-[#581c87] text-white shadow-[0_24px_56px_rgba(88,28,135,0.28)] lg:flex">
+            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-gradient-to-b from-[#1e1038] via-[#2e1065] to-[#581c87] text-white shadow-[0_24px_56px_rgba(46,16,101,0.28)] lg:flex">
                 <div class="flex flex-col gap-sm p-md">
                     <div class="flex items-center gap-3 py-sm">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#c084fc] via-[#8b5cf6] to-[#d946ef] text-white shadow-[0_14px_28px_rgba(192,132,252,0.28)]">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#d1bcff] via-[#8455ef] to-[#dc49f2] text-white shadow-[0_14px_28px_rgba(132,85,239,0.32)]">
                             <span class="material-symbols-outlined fill">domain</span>
                         </div>
                         <div>
@@ -45,9 +45,9 @@
 
                 </div>
 
-                <nav class="custom-scrollbar flex-1 space-y-1 overflow-y-auto px-sm py-md">
+                <nav class="custom-scrollbar flex-1 space-y-1.5 overflow-y-auto px-sm py-md">
                     @foreach($navLinks as [$pattern, $route, $label, $icon])
-                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-xl px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'bg-white font-bold text-primary shadow-[0_16px_34px_rgba(216,180,254,0.22)]' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-lg border-s-4 px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'border-[#d1bcff] bg-white/12 font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]' : 'border-transparent text-white/70 hover:bg-white/10 hover:text-white' }}">
                             <span class="material-symbols-outlined {{ request()->routeIs($pattern) ? 'fill' : '' }}">{{ $icon }}</span>
                             <span class="text-body-md">{{ $label }}</span>
                         </a>
@@ -70,21 +70,21 @@
             </aside>
 
             <main class="flex h-screen flex-1 flex-col overflow-hidden lg:ms-sidebar-width">
-                <header class="sticky top-0 z-40 flex min-h-[76px] w-full items-center justify-between border-b border-outline-variant/15 bg-white/92 px-md py-3 shadow-[0_18px_44px_rgba(88,28,135,0.08)] backdrop-blur-xl">
-                    <div class="flex min-w-0 flex-1 items-center justify-start">
-                        <div class="relative hidden w-full max-w-md md:block">
-                            <input class="h-12 w-full rounded-full border border-outline-variant/25 bg-surface-container-lowest py-2 ps-12 pe-5 text-body-sm text-on-surface shadow-[0_10px_26px_rgba(88,28,135,0.05)] transition placeholder:text-on-surface-variant/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10" placeholder="{{ __('layout.search_placeholder') }}" type="text">
+                <header class="sticky top-0 z-40 flex min-h-[72px] w-full items-center justify-between gap-4 border-b border-outline-variant/50 bg-white/88 px-md py-3 shadow-[0_10px_28px_rgba(25,28,30,0.05)] backdrop-blur-xl">
+                    <div class="flex min-w-0 flex-[1.7] items-center justify-start">
+                        <div class="relative hidden w-full max-w-3xl md:block xl:max-w-4xl">
+                            <input class="h-11 w-full rounded-full border border-outline-variant/60 bg-surface-container-lowest py-2 ps-12 pe-5 text-body-sm text-on-surface shadow-[0_8px_22px_rgba(25,28,30,0.04)] transition placeholder:text-on-surface-variant/70 focus:border-secondary focus:bg-white focus:ring-4 focus:ring-secondary/10" placeholder="{{ __('layout.search_placeholder') }}" type="text">
                             <span class="material-symbols-outlined absolute start-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-1 items-center justify-end gap-3">
+                    <div class="flex flex-none items-center justify-end gap-3">
                         <div class="hidden items-center gap-2 sm:flex">
                             @if($isHr)
-                                <a href="{{ route('nitaqat.calculator') }}" class="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant/20 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary-fixed hover:text-primary {{ request()->routeIs('nitaqat.calculator') ? 'border-primary/40 bg-primary-fixed text-primary' : '' }}" title="{{ __('layout.nitaqat_calculator') }}" aria-label="{{ __('layout.nitaqat_calculator') }}">
+                                <a href="{{ route('nitaqat.calculator') }}" class="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant/50 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-secondary/40 hover:bg-primary-fixed hover:text-primary {{ request()->routeIs('nitaqat.calculator') ? 'border-secondary/50 bg-primary-fixed text-primary' : '' }}" title="{{ __('layout.nitaqat_calculator') }}" aria-label="{{ __('layout.nitaqat_calculator') }}">
                                     <span class="material-symbols-outlined text-[22px]">calculate</span>
                                 </a>
-                                <button class="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant/20 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.companies') }}">
+                                <button class="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant/50 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-secondary/40 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.companies') }}">
                                     <span class="material-symbols-outlined text-[22px]">business_center</span>
                                 </button>
                             @endif
@@ -102,7 +102,7 @@
                             @endif
                             @php $unreadNotifications = $user->unreadNotifications()->latest()->limit(10)->get(); @endphp
                             <details class="relative">
-                                <summary class="relative flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-outline-variant/20 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.notifications') }}">
+                                <summary class="relative flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-outline-variant/50 bg-white text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-secondary/40 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.notifications') }}">
                                     <span class="material-symbols-outlined text-[22px]">notifications</span>
                                     @if($unreadNotifications->isNotEmpty())
                                         <span class="absolute end-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-error px-0.5 text-[9px] font-black text-white">{{ $user->unreadNotifications()->count() }}</span>
@@ -142,15 +142,15 @@
                             <form method="POST" action="{{ route('locale.update') }}">
                                 @csrf
                                 <input type="hidden" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}">
-                                <button type="submit" class="flex h-10 items-center gap-1.5 rounded-full border border-outline-variant/20 bg-white px-3 text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.language') }}">
+                                <button type="submit" class="flex h-10 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 text-on-surface shadow-sm transition hover:-translate-y-0.5 hover:border-secondary/40 hover:bg-primary-fixed hover:text-primary" title="{{ __('layout.language') }}">
                                     <span class="material-symbols-outlined text-[22px]">language</span>
                                     <span class="text-xs font-bold uppercase">{{ app()->getLocale() === 'ar' ? 'EN' : 'AR' }}</span>
                                 </button>
                             </form>
                         </div>
 
-                        <div class="hidden items-center gap-3 rounded-full border border-outline-variant/20 bg-white py-1.5 ps-1.5 pe-4 shadow-[0_10px_26px_rgba(88,28,135,0.06)] transition hover:border-primary/30 sm:flex">
-                            <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-primary-fixed text-sm font-black text-primary">
+                        <div class="hidden items-center gap-3 rounded-full border border-outline-variant/50 bg-white py-1.5 ps-1.5 pe-4 shadow-[0_8px_22px_rgba(25,28,30,0.05)] transition hover:border-secondary/40 sm:flex">
+                            <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-primary-container bg-primary-fixed text-sm font-black text-primary">
                                 {{ mb_substr($user->name, 0, 1) }}
                             </div>
                             <div class="leading-tight">
@@ -161,12 +161,12 @@
                     </div>
                 </header>
 
-                <div class="hide-scrollbar flex-1 overflow-y-auto p-md lg:p-lg">
+                <div class="hide-scrollbar flex-1 overflow-y-auto p-md pb-24 lg:p-lg">
                     @yield('content')
                 </div>
             </main>
 
-            <nav class="fixed bottom-0 start-0 end-0 z-50 grid grid-cols-4 border-t border-outline-variant bg-surface-container-lowest/95 py-2 shadow-[0_-8px_22px_rgba(88,28,135,0.12)] backdrop-blur-xl lg:hidden">
+            <nav class="fixed bottom-0 start-0 end-0 z-50 grid grid-cols-4 border-t border-outline-variant bg-surface-container-lowest/95 py-2 shadow-[0_-8px_22px_rgba(25,28,30,0.10)] backdrop-blur-xl lg:hidden">
                 <a href="{{ route('dashboard') }}" class="flex flex-col items-center {{ request()->routeIs('dashboard') ? 'font-bold text-primary' : 'text-on-surface-variant' }}"><span class="material-symbols-outlined {{ request()->routeIs('dashboard') ? 'fill' : '' }}">dashboard</span><span class="text-[10px]">{{ __('layout.nav.home') }}</span></a>
                 <a href="{{ route('employees.index') }}" class="flex flex-col items-center {{ request()->routeIs('employees.*') ? 'font-bold text-primary' : 'text-on-surface-variant' }}"><span class="material-symbols-outlined {{ request()->routeIs('employees.*') ? 'fill' : '' }}">groups</span><span class="text-[10px]">{{ __('layout.nav.employees') }}</span></a>
                 @if($isHr)

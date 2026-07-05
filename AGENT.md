@@ -33,10 +33,10 @@ This is a **group HR system** for four legal entities operating as one
 group. Model them as four `companies` records under a shared group
 structure from day one — don't build single-company-first and retrofit:
 
-1. **Amniat**
-2. **Amniat Factory**
-3. **PTC**
-4. **PTC Construction**
+1. **Amniat أمنيات **
+2. **Amniat Factory مصنع أمنيات**
+3. **PTC تقنيات الدهان للتجارة**
+4. **PTC Construction تقنيات الدهان للمقاولات**
 
 Implications:
 

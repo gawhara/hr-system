@@ -3,58 +3,88 @@
 @section('title', $employee->name_ar)
 
 @section('content')
-    <div class="space-y-6">
+    <div class="mx-auto max-w-7xl space-y-6">
         @if(session('status'))
             <div class="rounded-2xl border border-green-300 bg-green-50 p-4 text-sm font-bold text-green-800">{{ session('status') }}</div>
         @endif
 
-        <div class="glass-card overflow-hidden rounded-2xl">
-            <div class="bg-primary p-8 text-on-primary">
-                <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div class="overflow-hidden rounded-3xl border border-outline-variant/50 bg-white shadow-[0_18px_44px_rgba(25,28,30,0.06)]">
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#170040] via-[#2e1065] to-[#6b38d4] p-6 text-white sm:p-8">
+                <div class="absolute -top-24 end-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+                <div class="absolute -bottom-28 start-8 h-72 w-72 rounded-full bg-[#dc49f2]/18 blur-3xl"></div>
+                <div class="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div class="flex items-center gap-5">
-                        <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/15 text-3xl font-black ring-1 ring-white/20">
+                        <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-white/18 bg-white/12 text-4xl font-black ring-1 ring-white/12">
                             {{ mb_substr($employee->name_ar, 0, 1) }}
                         </div>
                         <div>
-                            <h2 class="text-3xl font-black">{{ $employee->name_ar }}</h2>
-                            <p class="mt-1 text-on-primary-container">{{ $employee->position?->title_ar }} - {{ $employee->employee_code }}</p>
+                            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white/78 backdrop-blur">
+                                <span class="material-symbols-outlined text-base">person</span>
+                                ملف موظف
+                            </span>
+                            <h2 class="mt-3 text-3xl font-black sm:text-4xl">{{ $employee->name_ar }}</h2>
+                            <p class="mt-2 text-sm text-white/72">{{ $employee->position?->title_ar }} - <span class="font-tabular">{{ $employee->employee_code }}</span></p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
                         @can('manage-employees')
-                            <a href="{{ route('employees.edit', $employee) }}" class="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-bold ring-1 ring-white/20 hover:bg-white/25">
+                            <a href="{{ route('employees.edit', $employee) }}" class="flex items-center gap-2 rounded-xl bg-white/12 px-4 py-2 text-sm font-bold ring-1 ring-white/18 transition hover:bg-white/20">
                                 <span class="material-symbols-outlined text-base">edit</span>
                                 <span>تعديل</span>
                             </a>
                             <details class="relative">
-                                <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-bold ring-1 ring-white/20 hover:bg-white/25">
+                                <summary class="flex cursor-pointer list-none items-center gap-2 rounded-xl bg-white/12 px-4 py-2 text-sm font-bold ring-1 ring-white/18 transition hover:bg-white/20">
                                     <span class="material-symbols-outlined text-base">swap_horiz</span>
                                     <span>تغيير الحالة</span>
                                 </summary>
                                 <form method="POST" action="{{ route('employees.status', $employee) }}"
-                                      class="absolute start-0 top-12 z-50 w-72 space-y-3 rounded-2xl border border-outline-variant/30 bg-white p-4 text-on-surface shadow-2xl"
+                                      class="absolute start-0 top-12 z-50 w-80 space-y-3 rounded-2xl border border-outline-variant/40 bg-white p-4 text-on-surface shadow-2xl"
                                       onsubmit="return confirm('تأكيد تغيير حالة الموظف؟ يُسجل التغيير في سجل الحالات وسجل التدقيق.');">
                                     @csrf
                                     <label class="block text-xs font-bold text-on-surface-variant">الحالة الجديدة</label>
-                                    <select name="status" class="stitch-input w-full p-2 text-sm">
+                                    <select name="status" class="stitch-input w-full px-3 py-2 text-sm">
                                         @foreach(\App\Models\Employee::STATUSES as $statusOption)
                                             @continue($statusOption === $employee->status)
                                             <option value="{{ $statusOption }}">{{ \App\Models\Employee::STATUS_LABELS_AR[$statusOption] }}</option>
                                         @endforeach
                                     </select>
                                     <label class="block text-xs font-bold text-on-surface-variant">السبب (إلزامي عند الإيقاف أو الإنهاء)</label>
-                                    <textarea name="reason" class="stitch-input h-20 w-full p-2 text-sm"></textarea>
+                                    <textarea name="reason" class="stitch-input h-20 w-full px-3 py-2 text-sm"></textarea>
                                     <button class="stitch-btn-primary w-full py-2 text-sm">حفظ الحالة</button>
                                 </form>
                             </details>
                         @endcan
-                        <span class="rounded-full bg-secondary-container px-4 py-2 text-sm font-bold text-on-secondary-container">
+                        <span class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-primary shadow-[0_14px_28px_rgba(23,0,64,0.18)]">
+                            <span class="h-2 w-2 rounded-full bg-green-500"></span>
                             {{ \App\Models\Employee::STATUS_LABELS_AR[$employee->status] ?? $employee->status }}
                         </span>
                     </div>
                 </div>
             </div>
         </div>
+
+        @php
+            $profileSummary = $employee->profileCompletion();
+        @endphp
+
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach([
+                ['label' => 'اكتمال الملف', 'value' => $profileSummary['percent'].'%', 'icon' => 'fact_check'],
+                ['label' => 'الشركة', 'value' => $employee->company?->name_ar ?? '-', 'icon' => 'corporate_fare'],
+                ['label' => 'القسم', 'value' => $employee->department?->name_ar ?? '-', 'icon' => 'groups'],
+                ['label' => 'المدير المباشر', 'value' => $employee->manager?->name_ar ?? '-', 'icon' => 'supervisor_account'],
+            ] as $metric)
+                <div class="app-kpi-card p-5">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-on-surface-variant">{{ $metric['label'] }}</p>
+                            <strong class="mt-2 block truncate text-xl font-black text-on-surface">{{ $metric['value'] }}</strong>
+                        </div>
+                        <span class="material-symbols-outlined rounded-xl bg-primary-fixed p-2 text-primary">{{ $metric['icon'] }}</span>
+                    </div>
+                </div>
+            @endforeach
+        </section>
 
         @php
             $tabs = [
@@ -72,11 +102,11 @@
             }
         @endphp
 
-        <div class="glass-card rounded-2xl p-2" data-tabs>
-            <nav class="flex flex-wrap gap-1">
+        <div class="app-card sticky top-[88px] z-30 p-2" data-tabs>
+            <nav class="flex gap-1 overflow-x-auto">
                 @foreach($tabs as $key => [$label, $icon])
                     <button type="button" data-tab-trigger="{{ $key }}"
-                            class="tab-trigger flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-on-surface-variant transition hover:bg-surface-container-low">
+                            class="tab-trigger flex shrink-0 items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-on-surface-variant transition hover:bg-surface-container-low">
                         <span class="material-symbols-outlined text-lg">{{ $icon }}</span>
                         <span>{{ $label }}</span>
                     </button>
@@ -99,7 +129,7 @@
                 </div>
             @endif
             <div class="grid gap-6 xl:grid-cols-3">
-                <section class="glass-card rounded-2xl p-6 xl:col-span-2">
+                <section class="app-card p-6 xl:col-span-2">
                     <h3 class="mb-5 text-xl font-bold text-on-surface">البيانات الشخصية</h3>
                     <dl class="grid gap-4 sm:grid-cols-2">
                         @foreach([
@@ -122,7 +152,7 @@
                             'انتهاء الإقامة' => $employee->iqama_expiry?->format('Y-m-d'),
                             'انتهاء الجواز' => $employee->passport_expiry?->format('Y-m-d'),
                         ] as $label => $value)
-                            <div class="rounded-xl bg-surface-container-low p-4">
+                            <div class="rounded-xl border border-outline-variant/35 bg-surface-container-low p-4">
                                 <dt class="text-xs font-bold text-on-surface-variant">{{ $label }}</dt>
                                 <dd class="mt-1 font-bold text-on-surface">{{ $value ?? '-' }}</dd>
                             </div>
@@ -131,7 +161,7 @@
                 </section>
 
                 <aside class="space-y-6">
-                    <div class="glass-card rounded-2xl p-6">
+                    <div class="app-card p-6">
                         <h3 class="mb-4 text-xl font-bold text-on-surface">التواصل</h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex items-center justify-between"><span class="text-on-surface-variant">البريد الإلكتروني</span><span dir="ltr" class="font-bold">{{ $employee->email ?? '-' }}</span></div>
@@ -142,7 +172,7 @@
                         </div>
                     </div>
 
-                    <div class="glass-card rounded-2xl p-6">
+                    <div class="app-card p-6">
                         <h3 class="mb-4 text-xl font-bold text-on-surface">الراتب</h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between"><span>الأساسي</span><strong>{{ $money($employee->basic_salary) ?? '-' }}</strong></div>
@@ -157,7 +187,7 @@
                 </aside>
             </div>
 
-            <section class="glass-card rounded-2xl p-6">
+            <section class="app-card p-6">
                 <h3 class="mb-5 text-xl font-bold text-on-surface">بيانات ملف الموظفين</h3>
                 <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach([
@@ -170,7 +200,7 @@
                         'بدل السكن بالتأمينات' => $money($employee->housing_allowance_gosi),
                         'بنود تأمينات أخرى' => $money($employee->other_gosi_items),
                     ] as $label => $value)
-                        <div class="rounded-xl bg-surface-container-low p-4">
+                        <div class="rounded-xl border border-outline-variant/35 bg-surface-container-low p-4">
                             <dt class="text-xs font-bold text-on-surface-variant">{{ $label }}</dt>
                             <dd class="mt-1 font-bold text-on-surface">{{ $value ?? '-' }}</dd>
                         </div>
@@ -178,7 +208,7 @@
                 </dl>
             </section>
 
-            <section class="glass-card rounded-2xl p-6">
+            <section class="app-card p-6">
                 <h3 class="mb-5 text-xl font-bold text-on-surface">الاستقطاعات والتحويلات</h3>
                 <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach([
@@ -197,7 +227,7 @@
                         'تحويل بنك الرياض' => $money($employee->riyad_bank_transfer),
                         'الراتب المتبقي' => $money($employee->remaining_salary),
                     ] as $label => $value)
-                        <div class="rounded-xl bg-surface-container-low p-4">
+                        <div class="rounded-xl border border-outline-variant/35 bg-surface-container-low p-4">
                             <dt class="text-xs font-bold text-on-surface-variant">{{ $label }}</dt>
                             <dd class="mt-1 font-bold text-on-surface">{{ $value ?? '-' }}</dd>
                         </div>
@@ -336,7 +366,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
-                                <tr class="border-b border-outline-variant text-right text-xs font-bold text-on-surface-variant">
+                                <tr class="border-b border-outline-variant text-start text-xs font-bold text-on-surface-variant">
                                     <th class="p-3">النوع</th>
                                     <th class="p-3">رقم الوثيقة</th>
                                     <th class="p-3">تاريخ الانتهاء</th>
@@ -420,7 +450,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
-                                <tr class="border-b border-outline-variant text-right text-xs font-bold text-on-surface-variant">
+                                <tr class="border-b border-outline-variant text-start text-xs font-bold text-on-surface-variant">
                                     <th class="p-3">نوع الإجازة</th>
                                     <th class="p-3">من</th>
                                     <th class="p-3">إلى</th>
@@ -465,7 +495,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
-                                <tr class="border-b border-outline-variant text-right text-xs font-bold text-on-surface-variant">
+                                <tr class="border-b border-outline-variant text-start text-xs font-bold text-on-surface-variant">
                                     <th class="p-3">التاريخ</th>
                                     <th class="p-3">الحضور</th>
                                     <th class="p-3">الانصراف</th>
@@ -513,13 +543,13 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead>
-                                    <tr class="border-b border-outline-variant text-right text-xs font-bold text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant text-start text-xs font-bold text-on-surface-variant">
                                         <th class="p-3">الفترة</th>
                                         <th class="p-3">الإجمالي</th>
                                         <th class="p-3">الاستقطاعات</th>
                                         <th class="p-3">الصافي</th>
                                         <th class="p-3">حالة المسير</th>
-                                        @can('view-payroll')<th class="p-3"></th>@endcan
+                                        <th class="p-3"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -540,11 +570,17 @@
                                                 @endphp
                                                 <span class="rounded-full px-3 py-1 text-xs font-bold {{ $cycleStatusMeta[1] }}">{{ $cycleStatusMeta[0] }}</span>
                                             </td>
-                                            @can('view-payroll')
-                                                <td class="p-3">
-                                                    <a href="{{ route('payroll.show', $item->payroll_cycle_id) }}" class="font-bold text-primary hover:underline">عرض المسير</a>
-                                                </td>
-                                            @endcan
+                                            <td class="p-3">
+                                                <div class="flex items-center gap-3">
+                                                    {{-- Self-service payslips only for locked (official) runs. --}}
+                                                    @if(auth()->user()->can('view-payroll') || $item->cycle?->status === 'locked')
+                                                        <a href="{{ route('payroll.payslip', [$item->payroll_cycle_id, $item]) }}" class="font-bold text-primary hover:underline">قسيمة الراتب</a>
+                                                    @endif
+                                                    @can('view-payroll')
+                                                        <a href="{{ route('payroll.show', $item->payroll_cycle_id) }}" class="font-bold text-primary hover:underline">عرض المسير</a>
+                                                    @endcan
+                                                </div>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

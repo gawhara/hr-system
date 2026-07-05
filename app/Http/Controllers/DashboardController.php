@@ -115,7 +115,11 @@ class DashboardController extends Controller
 
     private function companyLogo(Company $company): string
     {
-        $name = mb_strtolower($company->name.' '.$company->name_ar);
+        if ($company->logo_path) {
+            return $company->logo_path;
+        }
+
+        $name = mb_strtolower($company->name_en.' '.$company->name_ar);
 
         return match (true) {
             str_contains($name, 'factory') || str_contains($name, 'مصنع') => 'images/companies/amniat-factory.png',
@@ -127,7 +131,7 @@ class DashboardController extends Controller
 
     private function companyTheme(Company $company): array
     {
-        $name = mb_strtolower($company->name.' '.$company->name_ar);
+        $name = mb_strtolower($company->name_en.' '.$company->name_ar);
 
         if (str_contains($name, 'ptc') || str_contains($name, 'تقنيات') || str_contains($name, 'دهان')) {
             return [

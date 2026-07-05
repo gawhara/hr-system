@@ -3,46 +3,57 @@
 @section('title', 'الإجازات')
 
 @section('content')
-    <div class="space-y-6">
+    <div class="mx-auto max-w-7xl space-y-6">
         @if(session('status'))
             <div class="rounded-xl bg-surface-container-low px-4 py-3 text-sm font-bold text-primary ring-1 ring-outline-variant">{{ session('status') }}</div>
         @endif
 
-        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <section class="flex flex-col justify-between gap-4 rounded-3xl border border-outline-variant/50 bg-white p-6 shadow-[0_16px_38px_rgba(25,28,30,0.05)] md:flex-row md:items-end">
             <div>
-                <h2 class="text-4xl font-black text-primary">إدارة الإجازات</h2>
-                <p class="mt-2 text-on-surface-variant">نظرة عامة على طلبات الموظفين وإدارة رصيد الإجازات السنوي.</p>
+                <p class="font-label text-xs font-bold uppercase tracking-[0.18em] text-secondary">Leave Management</p>
+                <h2 class="mt-2 text-3xl font-black text-on-surface">إدارة الإجازات</h2>
+                <p class="mt-2 text-sm text-on-surface-variant">نظرة عامة على طلبات الموظفين وإدارة أرصدة الإجازات السنوية.</p>
             </div>
-            <a href="{{ route('leaves.create') }}" class="stitch-btn-primary flex items-center gap-2 px-6 py-3">طلب إجازة جديد</a>
-        </div>
+            <a href="{{ route('leaves.create') }}" class="stitch-btn-primary flex items-center gap-2 px-6 py-3">
+                <span class="material-symbols-outlined">add</span>
+                <span>طلب إجازة جديد</span>
+            </a>
+        </section>
 
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-12">
-            <aside class="glass-card rounded-2xl p-6 xl:col-span-4">
-                <div class="mb-6 flex items-center justify-between">
-                    <h3 class="text-lg font-bold">رصيد الإجازات</h3>
-                    <span class="rounded-full bg-secondary-container px-3 py-1 text-xs font-bold text-on-secondary-container">{{ now()->format('Y') }}</span>
+        <div class="grid grid-cols-1 gap-5 xl:grid-cols-12">
+            <aside class="app-card p-5 xl:col-span-4">
+                <div class="mb-5 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-black text-on-surface">رصيد الإجازات</h3>
+                        <p class="mt-1 text-xs text-on-surface-variant">عرض مرجعي سريع للأنواع الشائعة</p>
+                    </div>
+                    <span class="rounded-full bg-secondary-fixed px-3 py-1 text-xs font-bold text-secondary">{{ now()->format('Y') }}</span>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     @foreach(['سنوية' => 21, 'مرضية' => 30, 'طارئة' => 5] as $label => $days)
-                        <div class="rounded-xl bg-surface-container p-4">
-                            <div class="flex items-center justify-between">
+                        <div class="rounded-2xl border border-outline-variant/35 bg-surface-container-low p-4">
+                            <div class="mb-3 flex items-center justify-between">
                                 <div>
                                     <p class="text-xs text-on-surface-variant">{{ $label }}</p>
                                     <p class="font-bold">{{ $days }} يوم</p>
                                 </div>
-                                <div class="h-1 w-16 overflow-hidden rounded-full bg-outline-variant">
-                                    <div class="h-full bg-primary" style="width: {{ min(100, $days * 3) }}%"></div>
-                                </div>
+                                <span class="font-tabular text-lg font-black text-primary">{{ $days }}</span>
+                            </div>
+                            <div class="h-2 overflow-hidden rounded-full bg-surface-container">
+                                <div class="h-full rounded-full bg-primary" style="width: {{ min(100, $days * 3) }}%"></div>
                             </div>
                         </div>
                     @endforeach
                 </div>
             </aside>
 
-            <section class="glass-card rounded-2xl p-6 xl:col-span-8">
-                <div class="mb-6 flex items-center justify-between">
-                    <h3 class="text-lg font-bold">تصفية الطلبات</h3>
-                    <span class="text-sm text-on-surface-variant">الحالة الحالية</span>
+            <section class="app-card p-5 xl:col-span-8">
+                <div class="mb-5 flex items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-black text-on-surface">تصفية الطلبات</h3>
+                        <p class="mt-1 text-xs text-on-surface-variant">الحالة الحالية للطلبات</p>
+                    </div>
+                    <span class="rounded-full bg-surface-container-low px-3 py-1 text-xs font-bold text-on-surface-variant">{{ $leaveRequests->total() }} طلب</span>
                 </div>
                 <form class="flex flex-col gap-3 sm:flex-row">
                     <select name="status" class="stitch-input px-4 py-3">
@@ -56,14 +67,14 @@
             </section>
         </div>
 
-        <div class="glass-card overflow-hidden rounded-2xl">
-            <div class="flex items-center justify-between border-b border-outline-variant p-6">
-                <h3 class="text-lg font-bold">طلبات بانتظار الموافقة</h3>
+        <section class="app-card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-outline-variant/50 bg-white p-5">
+                <h3 class="text-lg font-black text-on-surface">طلبات بانتظار المعالجة</h3>
                 <span class="rounded-full bg-error-container px-3 py-1 text-xs font-bold text-on-error-container">{{ $leaveRequests->total() }} طلب</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-right text-sm">
-                    <thead class="bg-surface-container-low text-on-surface-variant">
+                <table class="app-table min-w-[960px] text-start text-sm">
+                    <thead>
                         <tr>
                             <th class="px-6 py-4 font-bold">الموظف</th>
                             <th class="px-6 py-4 font-bold">نوع الإجازة</th>
@@ -75,20 +86,24 @@
                     </thead>
                     <tbody class="divide-y divide-outline-variant/30">
                         @forelse($leaveRequests as $leave)
-                            <tr class="transition hover:bg-surface-container">
+                            <tr class="transition hover:bg-surface-container-low">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-highest font-bold text-primary">{{ mb_substr($leave->employee?->name_ar ?? '-', 0, 1) }}</div>
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-fixed font-bold text-primary">{{ mb_substr($leave->employee?->name_ar ?? '-', 0, 1) }}</div>
                                         <div>
                                             <p class="font-bold">{{ $leave->employee?->name_ar }}</p>
                                             <p class="text-[10px] text-on-surface-variant">{{ $leave->employee?->department?->name_ar }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4"><span class="rounded-full bg-surface-container-highest px-3 py-1 text-xs text-primary">{{ $leave->leaveType?->name_ar }}</span></td>
-                                <td class="px-6 py-4">{{ $leave->starts_on->format('Y-m-d') }} - {{ $leave->ends_on->format('Y-m-d') }}</td>
-                                <td class="px-6 py-4 font-bold">{{ number_format($leave->days, 2) }}</td>
-                                <td class="px-6 py-4">{{ ['pending' => 'معلق', 'approved' => 'موافق عليه', 'rejected' => 'مرفوض'][$leave->status] ?? $leave->status }}</td>
+                                <td class="px-6 py-4"><span class="app-status-chip bg-surface-container text-primary">{{ $leave->leaveType?->name_ar }}</span></td>
+                                <td class="px-6 py-4 font-tabular">{{ $leave->starts_on->format('Y-m-d') }} - {{ $leave->ends_on->format('Y-m-d') }}</td>
+                                <td class="px-6 py-4 font-tabular font-bold">{{ number_format($leave->days, 2) }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="app-status-chip @if($leave->status === 'approved') bg-green-100 text-green-700 @elseif($leave->status === 'rejected') bg-red-100 text-red-700 @else bg-yellow-100 text-yellow-800 @endif">
+                                        {{ ['pending' => 'معلق', 'approved' => 'موافق عليه', 'rejected' => 'مرفوض'][$leave->status] ?? $leave->status }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4">
                                     @if($leave->status === 'pending')
                                         <div class="flex gap-2">
@@ -101,12 +116,12 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="px-6 py-10 text-center text-on-surface-variant">لا توجد طلبات إجازة</td></tr>
+                            <tr><td colspan="6" class="px-6 py-12 text-center text-on-surface-variant">لا توجد طلبات إجازة</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-outline-variant p-4">{{ $leaveRequests->links() }}</div>
-        </div>
+            <div class="border-t border-outline-variant/50 p-4">{{ $leaveRequests->links() }}</div>
+        </section>
     </div>
 @endsection

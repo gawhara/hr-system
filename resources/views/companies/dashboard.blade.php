@@ -6,156 +6,164 @@
     @php
         $theme = $dashboard['theme'];
         $headcount = max((int) $dashboard['headcount'], 1);
+        $localizationPercent = (int) $localizationPercent;
         $nonSaudiPercent = round(((int) $dashboard['non_saudis'] / $headcount) * 100);
         $malePercent = round(((int) $genderChart['male'] / $headcount) * 100);
         $femalePercent = round(((int) $genderChart['female'] / $headcount) * 100);
         $nitaqatBand = $dashboard['nitaqat_band'];
+        $payrollPerEmployee = $dashboard['headcount'] > 0 ? $dashboard['monthly_payroll'] / $dashboard['headcount'] : 0;
     @endphp
 
-    <div class="mx-auto max-w-7xl space-y-6">
-        <div class="overflow-hidden rounded-3xl bg-surface-container-lowest shadow-[0_22px_46px_rgba(17,24,39,0.07)]">
-            <div class="h-2" style="background: linear-gradient(to left, {{ $theme['from'] }}, {{ $theme['to'] }});"></div>
-            <div class="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-                <div class="flex items-center gap-5">
-                    <div class="flex h-24 w-28 items-center justify-center rounded-3xl bg-white p-4 shadow-[0_14px_30px_rgba(17,24,39,0.08)] ring-1" style="--tw-ring-color: {{ $theme['ring'] }};">
-                        <img src="{{ asset($dashboard['logo']) }}" alt="{{ $company->name_ar }}" class="max-h-16 max-w-full object-contain">
+    <div class="mx-auto max-w-[1600px] space-y-4">
+        <section class="overflow-hidden rounded-2xl border border-outline-variant/50 bg-white shadow-[0_10px_28px_rgba(25,28,30,0.05)]">
+            <div class="h-1.5" style="background: linear-gradient(to left, {{ $theme['from'] }}, {{ $theme['to'] }});"></div>
+            <div class="flex flex-col gap-4 p-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex min-w-0 items-center gap-4">
+                    <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-white p-2 shadow-sm">
+                        <img src="{{ asset($dashboard['logo']) }}" alt="{{ $company->name_ar }}" class="max-h-12 max-w-full object-contain">
                     </div>
-                    <div>
-                        <a href="{{ route('dashboard') }}" class="mb-3 inline-flex items-center gap-2 text-sm font-bold" style="color: {{ $theme['text'] }};">
-                            <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    <div class="min-w-0">
+                        <a href="{{ route('dashboard') }}" class="mb-1 inline-flex items-center gap-1 text-xs font-black text-primary hover:underline">
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             العودة للوحة الرئيسية
                         </a>
-                        <h1 class="font-headline text-3xl font-bold" style="color: {{ $theme['text'] }};">{{ $company->name_ar }}</h1>
-                        <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-on-surface-variant">{{ $company->name }}</p>
+                        <h1 class="truncate text-2xl font-black text-primary">{{ $company->name_ar }}</h1>
+                        <p class="truncate text-xs font-bold uppercase tracking-wide text-outline">{{ $company->name_en ?: $company->name_ar }}</p>
                     </div>
                 </div>
 
-                <div class="rounded-3xl px-6 py-4" style="background: {{ $nitaqatBand['background'] }}; color: {{ $nitaqatBand['text'] }};">
-                    <span class="block text-xs font-bold opacity-70">نسبة التوطين</span>
-                    <strong class="mt-1 block font-headline text-4xl">{{ $localizationPercent }}%</strong>
-                    <span class="mt-2 inline-flex rounded-full bg-white/75 px-3 py-1 text-xs font-bold">{{ $nitaqatBand['label'] }}</span>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-w-[520px]">
+                    @foreach([
+                        ['label' => 'الموظفون', 'value' => $dashboard['headcount'], 'icon' => 'groups'],
+                        ['label' => 'النشطون', 'value' => $activeEmployees, 'icon' => 'verified_user'],
+                        ['label' => 'الفروع', 'value' => $branchesCount, 'icon' => 'account_tree'],
+                        ['label' => 'الأقسام', 'value' => $departmentsCount, 'icon' => 'category'],
+                    ] as $metric)
+                        <div class="rounded-2xl bg-surface-container-low px-3 py-2.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[11px] font-bold text-on-surface-variant">{{ $metric['label'] }}</span>
+                                <span class="material-symbols-outlined text-base text-secondary">{{ $metric['icon'] }}</span>
+                            </div>
+                            <strong class="mt-1 block font-tabular text-2xl font-black leading-none text-primary">{{ number_format($metric['value']) }}</strong>
+                        </div>
+                    @endforeach
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-            @foreach([
-                ['الموظفون', $dashboard['headcount'], 'groups'],
-                ['الموظفون النشطون', $activeEmployees, 'verified_user'],
-                ['الفروع', $branchesCount, 'account_tree'],
-                ['الأقسام', $departmentsCount, 'category'],
-            ] as [$label, $value, $icon])
-                <div class="rounded-3xl bg-surface-container-lowest p-5 shadow-[0_18px_36px_rgba(17,24,39,0.05)]">
-                    <span class="material-symbols-outlined" style="color: {{ $theme['text'] }};">{{ $icon }}</span>
-                    <span class="mt-5 block text-sm text-on-surface-variant">{{ $label }}</span>
-                    <strong class="mt-2 block font-headline text-3xl text-on-surface">{{ number_format($value) }}</strong>
-                </div>
-            @endforeach
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="rounded-3xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(17,24,39,0.05)]">
-                <h2 class="font-headline text-2xl font-bold" style="color: {{ $theme['text'] }};">توزيع الموظفين</h2>
-                <div class="mt-6 grid grid-cols-[180px_1fr] items-center gap-6">
-                    <div class="grid h-44 w-44 place-items-center rounded-full" style="background: conic-gradient({{ $nitaqatBand['from'] }} 0 {{ $localizationPercent }}%, #e5e7eb {{ $localizationPercent }}% 100%);">
-                        <div class="grid h-28 w-28 place-items-center rounded-full bg-white text-center">
-                            <span class="block text-xs text-on-surface-variant">التوطين</span>
-                            <strong class="font-headline text-3xl" style="color: {{ $nitaqatBand['text'] }};">{{ $localizationPercent }}%</strong>
+        <section class="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+            <div class="rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_20px_rgba(25,28,30,0.04)]">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center">
+                    <div class="grid shrink-0 place-items-center">
+                        <div class="grid h-36 w-36 place-items-center rounded-full" style="background: conic-gradient({{ $nitaqatBand['from'] }} 0 {{ $localizationPercent }}%, #e6e8ea {{ $localizationPercent }}% 100%);">
+                            <div class="grid h-24 w-24 place-items-center rounded-full bg-white text-center shadow-sm">
+                                <span class="text-[11px] font-bold text-on-surface-variant">التوطين</span>
+                                <strong class="font-tabular text-3xl font-black leading-none" style="color: {{ $nitaqatBand['text'] }};">{{ $localizationPercent }}%</strong>
+                                <span class="rounded-full px-2 py-0.5 text-[10px] font-black" style="background: {{ $nitaqatBand['background'] }}; color: {{ $nitaqatBand['text'] }};">{{ $nitaqatBand['label'] }}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="mb-2 flex justify-between text-sm font-bold">
+
+                    <div class="grid flex-1 gap-3 md:grid-cols-2">
+                        <div class="rounded-2xl bg-surface-container-low p-3">
+                            <div class="mb-1.5 flex justify-between text-xs font-bold">
                                 <span>السعوديون</span>
                                 <span>{{ number_format($dashboard['saudis']) }}</span>
                             </div>
-                            <div class="h-3 rounded-full bg-surface-container">
-                                <div class="h-3 rounded-full" style="width: {{ $localizationPercent }}%; background: linear-gradient(to left, {{ $nitaqatBand['from'] }}, {{ $nitaqatBand['to'] }});"></div>
+                            <div class="h-2 rounded-full bg-surface-container-high">
+                                <div class="h-2 rounded-full" style="width: {{ $localizationPercent }}%; background: linear-gradient(to left, {{ $nitaqatBand['from'] }}, {{ $nitaqatBand['to'] }});"></div>
                             </div>
                         </div>
-                        <div>
-                            <div class="mb-2 flex justify-between text-sm font-bold">
+                        <div class="rounded-2xl bg-surface-container-low p-3">
+                            <div class="mb-1.5 flex justify-between text-xs font-bold">
                                 <span>غير السعوديين</span>
                                 <span>{{ number_format($dashboard['non_saudis']) }}</span>
                             </div>
-                            <div class="h-3 rounded-full bg-surface-container">
-                                <div class="h-3 rounded-full" style="width: {{ $nonSaudiPercent }}%; background: {{ $theme['muted'] }};"></div>
+                            <div class="h-2 rounded-full bg-surface-container-high">
+                                <div class="h-2 rounded-full" style="width: {{ $nonSaudiPercent }}%; background: {{ $theme['muted'] }};"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-surface-container-low p-3">
+                            <p class="text-[11px] font-bold text-outline">الذكور</p>
+                            <strong class="mt-1 block font-tabular text-xl font-black text-primary">{{ number_format($genderChart['male']) }}</strong>
+                            <div class="mt-2 h-2 rounded-full bg-surface-container-high">
+                                <div class="h-2 rounded-full" style="width: {{ $malePercent }}%; background: {{ $theme['from'] }};"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-surface-container-low p-3">
+                            <p class="text-[11px] font-bold text-outline">الإناث</p>
+                            <strong class="mt-1 block font-tabular text-xl font-black text-primary">{{ number_format($genderChart['female']) }}</strong>
+                            <div class="mt-2 h-2 rounded-full bg-surface-container-high">
+                                <div class="h-2 rounded-full" style="width: {{ $femalePercent }}%; background: {{ $theme['to'] }};"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="rounded-3xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(17,24,39,0.05)]">
-                <h2 class="font-headline text-2xl font-bold" style="color: {{ $theme['text'] }};">الرواتب والتنبيهات</h2>
-                <div class="mt-6 grid grid-cols-2 gap-4">
-                    <div class="rounded-2xl p-5" style="background: {{ $theme['soft'] }};">
-                        <span class="block text-sm text-on-surface-variant">صافي الرواتب</span>
-                        <strong class="mt-2 block font-headline text-3xl" style="color: {{ $theme['text'] }};">{{ number_format($dashboard['monthly_payroll'], 0) }}</strong>
+            <div class="grid grid-cols-2 gap-4">
+                @foreach([
+                    ['label' => 'صافي الرواتب', 'value' => 'SAR '.number_format($dashboard['monthly_payroll'], 0), 'icon' => 'payments', 'tone' => 'bg-secondary-fixed text-secondary'],
+                    ['label' => 'متوسط الراتب', 'value' => 'SAR '.number_format($payrollPerEmployee, 0), 'icon' => 'trending_up', 'tone' => 'bg-primary-fixed text-primary'],
+                    ['label' => 'إجازات معلقة', 'value' => number_format($dashboard['pending_leaves']), 'icon' => 'event_busy', 'tone' => 'bg-error-container text-error'],
+                    ['label' => 'تنبيهات وثائق', 'value' => number_format($dashboard['document_alerts']), 'icon' => 'warning', 'tone' => 'bg-yellow-100 text-yellow-800'],
+                ] as $metric)
+                    <div class="rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_20px_rgba(25,28,30,0.04)]">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-bold text-outline">{{ $metric['label'] }}</p>
+                                <strong class="mt-2 block truncate font-tabular text-2xl font-black leading-none text-primary">{{ $metric['value'] }}</strong>
+                            </div>
+                            <span class="material-symbols-outlined rounded-xl p-2 {{ $metric['tone'] }}">{{ $metric['icon'] }}</span>
+                        </div>
                     </div>
-                    <div class="rounded-2xl bg-surface-container-low p-5">
-                        <span class="block text-sm text-on-surface-variant">متوسط الراتب الأساسي</span>
-                        <strong class="mt-2 block font-headline text-3xl text-on-surface">{{ number_format($averageSalary, 0) }}</strong>
-                    </div>
-                    <div class="rounded-2xl bg-error-container/55 p-5">
-                        <span class="block text-sm text-on-surface-variant">إجازات معلقة</span>
-                        <strong class="mt-2 block font-headline text-3xl text-error">{{ number_format($dashboard['pending_leaves']) }}</strong>
-                    </div>
-                    <div class="rounded-2xl p-5" style="background: {{ $theme['soft'] }};">
-                        <span class="block text-sm text-on-surface-variant">تنبيهات وثائق</span>
-                        <strong class="mt-2 block font-headline text-3xl" style="color: {{ $theme['text'] }};">{{ number_format($dashboard['document_alerts']) }}</strong>
-                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div class="rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_20px_rgba(25,28,30,0.04)]">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-black text-primary">الأقسام الأعلى عددا</h2>
+                    <span class="material-symbols-outlined text-secondary">bar_chart</span>
                 </div>
-            </section>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="rounded-3xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(17,24,39,0.05)]">
-                <h2 class="font-headline text-2xl font-bold" style="color: {{ $theme['text'] }};">الأقسام الأعلى عددًا</h2>
-                <div class="mt-6 space-y-4">
+                <div class="space-y-3">
                     @forelse($departmentChart as $department)
                         <div>
-                            <div class="mb-2 flex justify-between text-sm font-bold">
+                            <div class="mb-1.5 flex justify-between text-xs font-bold">
                                 <span>{{ $department['name'] }}</span>
-                                <span>{{ number_format($department['total']) }}</span>
+                                <span class="font-tabular">{{ number_format($department['total']) }}</span>
                             </div>
-                            <div class="h-3 rounded-full bg-surface-container">
-                                <div class="h-3 rounded-full" style="width: {{ $department['percent'] }}%; background: linear-gradient(to left, {{ $theme['from'] }}, {{ $theme['to'] }});"></div>
+                            <div class="h-2.5 rounded-full bg-surface-container">
+                                <div class="h-2.5 rounded-full" style="width: {{ $department['percent'] }}%; background: linear-gradient(to left, {{ $theme['from'] }}, {{ $theme['to'] }});"></div>
                             </div>
                         </div>
                     @empty
-                        <p class="rounded-2xl bg-surface-container-low p-5 text-center text-on-surface-variant">لا توجد بيانات أقسام لهذه الشركة.</p>
+                        <p class="rounded-2xl bg-surface-container-low p-4 text-center text-sm text-on-surface-variant">لا توجد بيانات أقسام لهذه الشركة.</p>
                     @endforelse
                 </div>
-            </section>
+            </div>
 
-            <section class="rounded-3xl bg-surface-container-lowest p-6 shadow-[0_18px_36px_rgba(17,24,39,0.05)]">
-                <h2 class="font-headline text-2xl font-bold" style="color: {{ $theme['text'] }};">مؤشرات إضافية</h2>
-                <div class="mt-6 space-y-4">
-                    <div>
-                        <div class="mb-2 flex justify-between text-sm font-bold">
-                            <span>ذكور</span>
-                            <span>{{ number_format($genderChart['male']) }}</span>
-                        </div>
-                        <div class="h-3 rounded-full bg-surface-container">
-                            <div class="h-3 rounded-full" style="width: {{ $malePercent }}%; background: {{ $theme['from'] }};"></div>
-                        </div>
+            <div class="rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_20px_rgba(25,28,30,0.04)]">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-black text-primary">ملخص الشركة</h2>
+                    <span class="material-symbols-outlined text-secondary">insights</span>
+                </div>
+                <div class="grid gap-3 md:grid-cols-2">
+                    <div class="rounded-2xl bg-surface-container-low p-4">
+                        <p class="text-[11px] font-bold text-outline">نسبة غير السعوديين</p>
+                        <strong class="mt-1 block font-tabular text-2xl font-black text-primary">{{ $nonSaudiPercent }}%</strong>
                     </div>
-                    <div>
-                        <div class="mb-2 flex justify-between text-sm font-bold">
-                            <span>إناث</span>
-                            <span>{{ number_format($genderChart['female']) }}</span>
-                        </div>
-                        <div class="h-3 rounded-full bg-surface-container">
-                            <div class="h-3 rounded-full" style="width: {{ $femalePercent }}%; background: {{ $theme['to'] }};"></div>
-                        </div>
+                    <div class="rounded-2xl bg-surface-container-low p-4">
+                        <p class="text-[11px] font-bold text-outline">متوسط الراتب الأساسي</p>
+                        <strong class="mt-1 block font-tabular text-2xl font-black text-primary">SAR {{ number_format($averageSalary, 0) }}</strong>
                     </div>
-                    <div class="rounded-2xl p-5 text-white" style="background: {{ $theme['dark'] }};">
-                        <span class="block text-sm text-white/65">حالة الصفحة</span>
-                        <strong class="mt-2 block text-xl">لوحة تفصيلية خاصة بالشركة</strong>
+                    <div class="rounded-2xl p-4 text-white md:col-span-2" style="background: {{ $theme['dark'] }};">
+                        <p class="text-xs font-bold text-white/65">حالة الصفحة</p>
+                        <strong class="mt-1 block text-base font-black">لوحة تفصيلية خاصة بالشركة</strong>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </div>
 @endsection

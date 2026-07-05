@@ -3,108 +3,162 @@
 @section('title', 'لوحة التحكم')
 
 @section('content')
-    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-5 md:grid-cols-2">
-        @foreach($companyDashboards as $index => $companyDashboard)
-            @php
-                $company = $companyDashboard['company'];
-                $localizationPercent = $companyDashboard['localization_percent'];
-                $localizationBand = $companyDashboard['nitaqat_band'];
-                $payrollPerEmployee = $companyDashboard['headcount'] > 0
-                    ? $companyDashboard['monthly_payroll'] / $companyDashboard['headcount']
-                    : 0;
-                $cardTone = [
-                    ['from' => '#2e1065', 'via' => '#6d28d9', 'to' => '#d946ef'],
-                    ['from' => '#3b0764', 'via' => '#7c3aed', 'to' => '#a21caf'],
-                    ['from' => '#1e1b4b', 'via' => '#6d28d9', 'to' => '#c026d3'],
-                    ['from' => '#581c87', 'via' => '#8b5cf6', 'to' => '#db2777'],
-                ][$index % 4];
-                $quickStats = [
-                    ['الموظفون', number_format($companyDashboard['headcount']), 'groups'],
-                    ['السعوديون', number_format($companyDashboard['saudis']), 'verified_user'],
-                    ['غير السعوديين', number_format($companyDashboard['non_saudis']), 'public'],
-                ];
-                $detailStats = [
-                    ['صافي الرواتب', number_format($companyDashboard['monthly_payroll'], 0), 'payments'],
-                    ['متوسط الراتب', number_format($payrollPerEmployee, 0), 'trending_up'],
-                    ['إجازات معلقة', number_format($companyDashboard['pending_leaves']), 'event_busy'],
-                    ['تنبيهات وثائق', number_format($companyDashboard['document_alerts']), 'notification_important'],
-                ];
-            @endphp
+    @php
+        $totals = [
+            'companies' => $companyDashboards->count(),
+            'headcount' => $companyDashboards->sum('headcount'),
+            'saudis' => $companyDashboards->sum('saudis'),
+            'non_saudis' => $companyDashboards->sum('non_saudis'),
+            'payroll' => $companyDashboards->sum('monthly_payroll'),
+            'pending_leaves' => $companyDashboards->sum('pending_leaves'),
+            'document_alerts' => $companyDashboards->sum('document_alerts'),
+        ];
 
-            <a href="{{ route('dashboard.companies.show', $company) }}"
-               class="group relative isolate min-h-[440px] overflow-hidden rounded-3xl border border-white/70 bg-white/82 p-1 shadow-[0_24px_54px_rgba(88,28,135,0.14)] ring-1 ring-outline-variant/20 backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:shadow-[0_30px_64px_rgba(88,28,135,0.20)] focus:outline-none focus:ring-4 focus:ring-primary/20">
-                <div class="absolute inset-0 -z-10 opacity-0 transition duration-300 group-hover:opacity-100"
-                     style="background: radial-gradient(circle at 18% 14%, {{ $cardTone['to'] }}24, transparent 28%), radial-gradient(circle at 86% 8%, {{ $cardTone['via'] }}20, transparent 30%);"></div>
+        $totals['localization_percent'] = $totals['headcount'] > 0
+            ? round(($totals['saudis'] / $totals['headcount']) * 100, 1)
+            : 0;
 
-                <div class="flex h-full flex-col overflow-hidden rounded-[1.35rem] bg-white/84">
-                    <div class="relative overflow-hidden p-5 text-white"
-                         style="background: linear-gradient(135deg, {{ $cardTone['from'] }}, {{ $cardTone['via'] }} 54%, {{ $cardTone['to'] }});">
-                        <div class="absolute -left-12 -top-16 h-44 w-44 rounded-full bg-white/12 blur-2xl"></div>
-                        <div class="absolute -bottom-20 right-16 h-48 w-48 rounded-full bg-fuchsia-200/15 blur-3xl"></div>
+        $highestPayroll = max((float) $totals['payroll'], 1);
+    @endphp
 
-                        <div class="relative flex items-start justify-between gap-5">
-                            <div class="min-w-0 flex-1">
-                                <span class="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/12 px-3 py-1 text-xs font-bold text-white/86 backdrop-blur-md">
-                                    <span class="material-symbols-outlined text-sm">dashboard</span>
-                                    لوحة شركة
-                                </span>
-                                <h2 class="mt-4 font-headline text-2xl font-black leading-8 text-white">{{ $company->name_ar }}</h2>
-                                <p class="mt-1 truncate text-xs font-bold uppercase tracking-wide text-white/58">{{ $company->name }}</p>
-                            </div>
+    <div class="mx-auto max-w-[1600px] space-y-4">
+        <section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            @forelse($companyDashboards as $companyDashboard)
+                @php
+                    $company = $companyDashboard['company'];
+                    $localizationPercent = $companyDashboard['localization_percent'];
+                    $localizationBand = $companyDashboard['nitaqat_band'];
+                    $payrollPerEmployee = $companyDashboard['headcount'] > 0
+                        ? $companyDashboard['monthly_payroll'] / $companyDashboard['headcount']
+                        : 0;
+                    $payrollWidth = min(100, round(($companyDashboard['monthly_payroll'] / $highestPayroll) * 100));
+                    $saudiWidth = min(100, max(0, $localizationPercent));
+                    $nonSaudiWidth = 100 - $saudiWidth;
+                    $bandLabel = $localizationBand['label'] ?? 'نطاق غير محدد';
+                @endphp
 
-                            <div class="flex h-24 w-28 shrink-0 items-center justify-center rounded-3xl border border-white/30 bg-white p-4 shadow-[0_18px_36px_rgba(30,16,56,0.22)]">
-                                <img src="{{ asset($companyDashboard['logo']) }}" alt="{{ $company->name_ar }}" class="max-h-16 max-w-full object-contain">
-                            </div>
-                        </div>
-
-                        <div class="relative mt-5 grid grid-cols-3 gap-3">
-                            @foreach($quickStats as [$label, $value, $icon])
-                                <div class="rounded-2xl border border-white/12 bg-white/12 p-3 backdrop-blur-md">
-                                    <div class="flex items-center justify-between gap-2 text-white/70">
-                                        <span class="text-xs font-bold">{{ $label }}</span>
-                                        <span class="material-symbols-outlined text-base">{{ $icon }}</span>
-                                    </div>
-                                    <strong class="mt-2 block font-headline text-2xl font-black text-white">{{ $value }}</strong>
+                <a href="{{ route('dashboard.companies.show', $company) }}"
+                   class="group overflow-hidden rounded-2xl border border-outline-variant/50 bg-white shadow-[0_8px_20px_rgba(25,28,30,0.045)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(25,28,30,0.07)] focus:outline-none focus:ring-4 focus:ring-secondary/20">
+                    <div class="border-b border-outline-variant/30 p-4">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <div class="flex h-12 w-14 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-white p-1.5 shadow-sm">
+                                    <img src="{{ asset($companyDashboard['logo']) }}" alt="{{ $company->name_ar }}" class="max-h-9 max-w-full object-contain">
                                 </div>
-                            @endforeach
+                                <div class="min-w-0">
+                                    <span class="mb-1 inline-flex rounded-full bg-primary-fixed px-2 py-0.5 text-[10px] font-black text-primary">لوحة شركة</span>
+                                    <h2 class="truncate text-xl font-bold text-primary">{{ $company->name_ar }}</h2>
+                                    <p class="truncate text-[11px] font-bold text-outline">{{ $company->name_en ?: $company->name_ar }}</p>
+                                </div>
+                            </div>
+
+                            <div class="shrink-0 text-end">
+                                <span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-black ring-1 ring-black/5" style="background: {{ $localizationBand['background'] }}; color: {{ $localizationBand['text'] }};">
+                                    {{ $bandLabel }}
+                                </span>
+                                <p class="mt-1 text-xs font-bold text-primary">توطين: <span class="font-tabular">{{ $localizationPercent }}%</span></p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-1 flex-col gap-4 p-5">
-                        <div class="rounded-3xl border border-outline-variant/30 bg-surface-container-lowest/78 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
-                            <div class="mb-3 flex items-center justify-between gap-3">
-                                <div>
-                                    <span class="block text-xs font-bold text-on-surface-variant">نسبة التوطين</span>
-                                    <strong class="mt-1 block font-headline text-3xl text-on-surface">{{ $localizationPercent }}%</strong>
+                    <div class="grid gap-4 p-4 md:grid-cols-[1fr_0.9fr]">
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[11px] font-bold text-outline">إجمالي الموظفين</p>
+                                <div class="mt-1 flex items-end gap-2">
+                                    <span class="font-tabular text-3xl font-black leading-none text-primary">{{ number_format($companyDashboard['headcount']) }}</span>
+                                    <span class="mb-0.5 inline-flex items-center gap-1 text-[11px] font-black text-secondary">
+                                        <span class="material-symbols-outlined text-sm">trending_up</span>
+                                        {{ $payrollWidth }}%
+                                    </span>
                                 </div>
-                                <span class="rounded-full px-3 py-1 text-xs font-black ring-1" style="background: {{ $localizationBand['background'] }}; color: {{ $localizationBand['text'] }}; --tw-ring-color: {{ $localizationBand['text'] }}22;">
-                                    {{ $localizationBand['label'] }}
-                                </span>
                             </div>
-                            <div class="h-3 overflow-hidden rounded-full bg-surface-container">
-                                <div class="h-full rounded-full transition-all duration-500" style="width: {{ $localizationPercent }}%; background: linear-gradient(to left, {{ $localizationBand['from'] }}, {{ $localizationBand['to'] }});"></div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between gap-3 text-xs text-on-surface-variant">
+                                    <span>سعودي ({{ number_format($companyDashboard['saudis']) }})</span>
+                                    <span>أجنبي ({{ number_format($companyDashboard['non_saudis']) }})</span>
+                                </div>
+                                <div class="flex h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+                                    <div class="h-full bg-secondary" style="width: {{ $saudiWidth }}%"></div>
+                                    <div class="h-full bg-primary/20" style="width: {{ $nonSaudiWidth }}%"></div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach($detailStats as [$label, $value, $icon])
-                                <div class="rounded-2xl border border-outline-variant/25 bg-white/72 p-4 shadow-[0_12px_24px_rgba(88,28,135,0.06)]">
-                                    <div class="mb-3 flex items-center justify-between gap-2">
-                                        <span class="text-xs font-bold text-on-surface-variant">{{ $label }}</span>
-                                        <span class="material-symbols-outlined text-lg text-primary">{{ $icon }}</span>
+                        <div class="rounded-xl bg-surface-container-low p-3">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-[11px] font-bold text-outline">صافي الرواتب</span>
+                                    <strong class="font-tabular text-sm font-black text-primary">SAR {{ number_format($companyDashboard['monthly_payroll'], 0) }}</strong>
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-[11px] font-bold text-outline">متوسط الراتب</span>
+                                    <strong class="font-tabular text-sm font-semibold text-on-surface-variant">SAR {{ number_format($payrollPerEmployee, 0) }}</strong>
+                                </div>
+                                <div class="border-t border-outline-variant/60 pt-2">
+                                    <div class="flex flex-wrap gap-x-4 gap-y-1">
+                                        <span class="inline-flex items-center gap-1 text-xs font-black text-error">
+                                            <span class="material-symbols-outlined text-sm">event_busy</span>
+                                            {{ number_format($companyDashboard['pending_leaves']) }} إجازة
+                                        </span>
+                                        <span class="inline-flex items-center gap-1 text-xs font-black text-tertiary-container">
+                                            <span class="material-symbols-outlined text-sm">warning</span>
+                                            {{ number_format($companyDashboard['document_alerts']) }} تنبيه
+                                        </span>
                                     </div>
-                                    <strong class="block truncate text-2xl font-black text-on-surface">{{ $value }}</strong>
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="mt-auto flex items-center justify-between rounded-2xl bg-primary px-4 py-3 text-white shadow-[0_16px_30px_rgba(109,40,217,0.22)]">
-                            <span class="text-sm font-black">فتح لوحة الشركة</span>
-                            <span class="material-symbols-outlined transition group-hover:-translate-x-1">arrow_back</span>
-                        </div>
+                    <div class="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-sm font-bold text-white transition group-hover:bg-primary-container">
+                        <span>فتح لوحة تحكم الشركة</span>
+                        <span class="material-symbols-outlined text-lg transition group-hover:-translate-x-1">chevron_left</span>
+                    </div>
+                </a>
+            @empty
+                <div class="rounded-2xl border border-outline-variant/50 bg-white p-8 text-center text-on-surface-variant xl:col-span-2">
+                    لا توجد شركات متاحة للعرض.
+                </div>
+            @endforelse
+        </section>
+
+        <section>
+            <div class="mb-3 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-primary">رؤى المجموعة الشاملة</h3>
+            </div>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div class="flex items-center gap-3 rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_18px_rgba(25,28,30,0.04)]">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-tertiary-fixed text-on-tertiary-fixed">
+                        <span class="material-symbols-outlined text-2xl">trending_up</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="truncate text-[11px] font-bold text-outline">متوسط التوطين العام</p>
+                        <p class="mt-0.5 font-tabular text-2xl font-black leading-none text-primary">{{ $totals['localization_percent'] }}%</p>
                     </div>
                 </div>
-            </a>
-        @endforeach
+
+                <div class="flex items-center gap-3 rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_18px_rgba(25,28,30,0.04)]">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary-fixed text-on-secondary-fixed">
+                        <span class="material-symbols-outlined text-2xl">payments</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="truncate text-[11px] font-bold text-outline">إجمالي الكتلة النقدية</p>
+                        <p class="mt-0.5 truncate font-tabular text-2xl font-black leading-none text-primary">SAR {{ number_format($totals['payroll'], 0) }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 rounded-2xl border border-outline-variant/50 bg-white p-4 shadow-[0_8px_18px_rgba(25,28,30,0.04)]">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-error-container text-on-error-container">
+                        <span class="material-symbols-outlined text-2xl">alarm</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="truncate text-[11px] font-bold text-outline">وثائق منتهية أو قريبة الانتهاء</p>
+                        <p class="mt-0.5 font-tabular text-2xl font-black leading-none text-primary">{{ number_format($totals['document_alerts']) }} وثيقة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 @endsection
