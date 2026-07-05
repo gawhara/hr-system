@@ -6,7 +6,7 @@
     <title>قسيمة راتب — {{ $item->employee?->name_ar }} — {{ $cycle->year }}/{{ str_pad($cycle->month, 2, '0', STR_PAD_LEFT) }}</title>
     @vite(['resources/css/app.css'])
     <style>
-        :root { --slip-primary: #5b21b6; --slip-line: #d4d4d8; --slip-muted: #71717a; }
+        :root { --slip-primary: #1a2b4b; --slip-accent: #d4af37; --slip-line: #d3daea; --slip-muted: #44474e; }
         html, body { background: #fff; }
         body { font-family: 'Cairo', ui-sans-serif, system-ui, sans-serif; color: #18181b; margin: 0; }
         .slip { max-width: 210mm; margin: 0 auto; padding: 12mm 14mm; position: relative; }

@@ -105,6 +105,7 @@ Company HR demo users are also seeded as `hr1@hr.local` through `hr4@hr.local`, 
 - Payroll cycle list and detailed payroll item view
 - Print-ready bilingual payslip per payroll item (browser print → PDF); self-service employees see own payslips of locked runs
 - Mudad/WPS-style CSV salary export for locked runs (audited; verify column spec against official Mudad docs before production)
+- Employee import/export with native `.xlsx` support and CSV fallback, plus a downloadable import template. Native Excel uses `openspout/openspout` because the local PHP 8.2 XAMPP runtime does not enable `ext-gd`, which blocks the heavier Laravel Excel / PhpSpreadsheet path.
 - Arabic RTL dashboard, company switcher, employee directory, and core HR module navigation
 - Local Cairo font assets, no CDN links
 

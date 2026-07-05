@@ -9,7 +9,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Reader\XLSX\Reader as XlsxReader;
+use OpenSpout\Writer\XLSX\Writer as XlsxWriter;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmployeeSpreadsheetController extends Controller
 {
@@ -119,7 +122,7 @@ class EmployeeSpreadsheetController extends Controller
         'remaining_salary',
     ];
 
-    public function export(Request $request): StreamedResponse
+    public function export(Request $request): Response
     {
         abort_unless($request->user()->can('manage-employees'), 403);
 
@@ -136,6 +139,22 @@ class EmployeeSpreadsheetController extends Controller
             ->event('employee_export')
             ->log('Employee spreadsheet exported');
 
+        if ($request->query('format') === 'xlsx') {
+            $filename = 'employees_'.now()->format('Ymd_His').'.xlsx';
+            $path = $this->writeXlsx($filename, function (XlsxWriter $writer) use ($companyIds, $filters, $search) {
+                $writer->addRow(Row::fromValues(self::COLUMNS));
+
+                $this->employeeExportQuery($companyIds, $filters, $search)
+                    ->each(function (Employee $employee) use ($writer) {
+                        $writer->addRow(Row::fromValues($this->employeeExportRow($employee)));
+                    });
+            });
+
+            return response()->download($path, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        }
+
         $filename = 'employees_'.now()->format('Ymd_His').'.csv';
 
         return response()->streamDownload(function () use ($companyIds, $filters, $search) {
@@ -143,28 +162,44 @@ class EmployeeSpreadsheetController extends Controller
             fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, self::COLUMNS);
 
-            Employee::with(['company', 'branch', 'department', 'position', 'shift', 'manager'])
-                ->whereIn('company_id', $companyIds)
-                ->when($filters['company_id'], fn ($query, $companyId) => $query->where('company_id', $companyId))
-                ->when($filters['branch_id'], fn ($query, $branchId) => $query->where('branch_id', $branchId))
-                ->when($filters['department_id'], fn ($query, $departmentId) => $query->where('department_id', $departmentId))
-                ->when($filters['status'], fn ($query, $status) => $query->where('status', $status))
-                ->when($filters['contract_type'], fn ($query, $contractType) => $query->where('contract_type', $contractType))
-                ->when($search !== '', function ($query) use ($search) {
-                    $query->where(function ($query) use ($search) {
-                        $query->where('name_ar', 'like', "%{$search}%")
-                            ->orWhere('name_en', 'like', "%{$search}%")
-                            ->orWhere('employee_code', 'like', "%{$search}%")
-                            ->orWhere('national_id_hash', hash('sha256', $search));
-                    });
-                })
-                ->orderBy('employee_code')
+            $this->employeeExportQuery($companyIds, $filters, $search)
                 ->each(function (Employee $employee) use ($out) {
-                    fputcsv($out, array_map(fn ($column) => $this->exportValue($employee, $column), self::COLUMNS));
+                    fputcsv($out, $this->employeeExportRow($employee));
                 });
 
             fclose($out);
         }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function template(Request $request): Response
+    {
+        abort_unless($request->user()->can('manage-employees'), 403);
+
+        $companyId = $request->integer('company_id') ?: null;
+
+        if ($companyId) {
+            abort_unless($request->user()->canAccessCompany($companyId), 403);
+        }
+
+        if ($request->query('format') === 'xlsx') {
+            $filename = 'employee_import_template.xlsx';
+            $path = $this->writeXlsx($filename, function (XlsxWriter $writer) {
+                $writer->addRow(Row::fromValues(self::COLUMNS));
+            });
+
+            return response()->download($path, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        }
+
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, self::COLUMNS);
+            fclose($out);
+        }, 'employee_import_template.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
@@ -175,7 +210,7 @@ class EmployeeSpreadsheetController extends Controller
 
         $data = $request->validate([
             'company_id' => ['nullable', 'integer', 'exists:companies,id'],
-            'import_file' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
+            'import_file' => ['required', 'file', 'mimes:csv,txt,xlsx', 'max:5120'],
         ]);
 
         $defaultCompanyId = (int) ($data['company_id'] ?? 0);
@@ -184,10 +219,19 @@ class EmployeeSpreadsheetController extends Controller
             abort_unless($request->user()->canAccessCompany($defaultCompanyId), 403);
         }
 
-        [$rows, $parseErrors] = $this->readCsv($data['import_file']);
+        [$rows, $parseErrors] = $this->readSpreadsheet($data['import_file']);
 
         if ($parseErrors !== []) {
-            return back()->withErrors(['import_file' => implode(' ', $parseErrors)])->withInput();
+            return back()
+                ->withErrors(['import_file' => 'تعذر قراءة ملف الاستيراد.'])
+                ->with('import_errors', $parseErrors)
+                ->withInput();
+        }
+
+        if ($rows === []) {
+            return back()
+                ->withErrors(['import_file' => 'ملف الاستيراد لا يحتوي على أي صفوف بيانات.'])
+                ->withInput();
         }
 
         $validatedRows = [];
@@ -199,7 +243,7 @@ class EmployeeSpreadsheetController extends Controller
             $companyId = (int) ($row['company_id'] ?? 0);
 
             if (! $companyId || ! $request->user()->canAccessCompany($companyId)) {
-                $rowErrors[] = "Row {$line}: company_id is missing or inaccessible.";
+                $rowErrors[] = "الصف {$line}: الشركة غير محددة أو غير متاحة لصلاحياتك.";
 
                 continue;
             }
@@ -207,7 +251,7 @@ class EmployeeSpreadsheetController extends Controller
             $validator = Validator::make($row, $this->rules($row));
 
             if ($validator->fails()) {
-                $rowErrors[] = "Row {$line}: ".$validator->errors()->first();
+                $rowErrors[] = "الصف {$line}: ".$validator->errors()->first();
 
                 continue;
             }
@@ -216,7 +260,11 @@ class EmployeeSpreadsheetController extends Controller
         }
 
         if ($rowErrors !== []) {
-            return back()->withErrors(['import_file' => implode(' ', array_slice($rowErrors, 0, 8))])->withInput();
+            return back()
+                ->withErrors(['import_file' => 'لم يتم استيراد الملف بسبب وجود أخطاء في البيانات.'])
+                ->with('import_errors', array_slice($rowErrors, 0, 8))
+                ->with('import_error_count', count($rowErrors))
+                ->withInput();
         }
 
         DB::transaction(function () use ($validatedRows) {
@@ -231,7 +279,12 @@ class EmployeeSpreadsheetController extends Controller
             ->withProperties(['rows' => count($validatedRows)])
             ->log('Employee spreadsheet imported');
 
-        return back()->with('status', 'Imported '.count($validatedRows).' employee rows.');
+        return back()
+            ->with('status', 'تم استيراد ملف الموظفين بنجاح.')
+            ->with('import_summary', [
+                'created' => count($validatedRows),
+                'file' => $data['import_file']->getClientOriginalName(),
+            ]);
     }
 
     private function accessibleCompanyIds(Request $request)
@@ -252,6 +305,45 @@ class EmployeeSpreadsheetController extends Controller
         ];
     }
 
+    private function employeeExportQuery($companyIds, array $filters, string $search)
+    {
+        return Employee::with(['company', 'branch', 'department', 'position', 'shift', 'manager'])
+            ->whereIn('company_id', $companyIds)
+            ->when($filters['company_id'], fn ($query, $companyId) => $query->where('company_id', $companyId))
+            ->when($filters['branch_id'], fn ($query, $branchId) => $query->where('branch_id', $branchId))
+            ->when($filters['department_id'], fn ($query, $departmentId) => $query->where('department_id', $departmentId))
+            ->when($filters['status'], fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['contract_type'], fn ($query, $contractType) => $query->where('contract_type', $contractType))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name_ar', 'like', "%{$search}%")
+                        ->orWhere('name_en', 'like', "%{$search}%")
+                        ->orWhere('employee_code', 'like', "%{$search}%")
+                        ->orWhere('national_id_hash', hash('sha256', $search));
+                });
+            })
+            ->orderBy('employee_code');
+    }
+
+    private function employeeExportRow(Employee $employee): array
+    {
+        return array_map(fn ($column) => $this->exportValue($employee, $column), self::COLUMNS);
+    }
+
+    private function writeXlsx(string $filename, callable $callback): string
+    {
+        $path = tempnam(storage_path('app'), pathinfo($filename, PATHINFO_FILENAME).'_');
+        unlink($path);
+        $path .= '.xlsx';
+
+        $writer = new XlsxWriter;
+        $writer->openToFile($path);
+        $callback($writer);
+        $writer->close();
+
+        return $path;
+    }
+
     private function exportValue(Employee $employee, string $column): mixed
     {
         $value = $employee->{$column};
@@ -261,6 +353,15 @@ class EmployeeSpreadsheetController extends Controller
         }
 
         return $value;
+    }
+
+    private function readSpreadsheet(UploadedFile $file): array
+    {
+        if (strtolower($file->getClientOriginalExtension()) === 'xlsx') {
+            return $this->readXlsx($file);
+        }
+
+        return $this->readCsv($file);
     }
 
     private function readCsv(UploadedFile $file): array
@@ -307,6 +408,65 @@ class EmployeeSpreadsheetController extends Controller
         fclose($handle);
 
         return [$rows, []];
+    }
+
+    private function readXlsx(UploadedFile $file): array
+    {
+        $reader = new XlsxReader;
+        $reader->open($file->getRealPath());
+
+        $header = null;
+        $rows = [];
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+            foreach ($sheet->getRowIterator() as $rowIndex => $xlsxRow) {
+                $values = array_map(fn ($cell) => $this->normalizeCellValue($cell->getValue()), $xlsxRow->getCells());
+
+                if ($rowIndex === 1) {
+                    $header = array_map(fn ($column) => $this->normalizeHeader((string) $column), $values);
+                    $unknownColumns = array_diff($header, self::COLUMNS);
+
+                    if ($unknownColumns !== []) {
+                        $reader->close();
+
+                        return [[], ['Unknown columns: '.implode(', ', $unknownColumns).'.']];
+                    }
+
+                    continue;
+                }
+
+                if (collect($values)->every(fn ($value) => trim((string) $value) === '')) {
+                    continue;
+                }
+
+                $row = [];
+
+                foreach ($header ?? [] as $index => $column) {
+                    $row[$column] = $values[$index] ?? null;
+                }
+
+                $rows[] = $row;
+            }
+
+            break;
+        }
+
+        $reader->close();
+
+        if ($header === null) {
+            return [[], ['The uploaded file is empty.']];
+        }
+
+        return [$rows, []];
+    }
+
+    private function normalizeCellValue(mixed $value): mixed
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        return $value;
     }
 
     private function normalizeHeader(string $column): string

@@ -45,6 +45,29 @@ class PayrollWorkflowTest extends TestCase
         $this->assertNotNull($cycle->locked_at);
     }
 
+    public function test_payroll_index_loads_with_action_links(): void
+    {
+        $this->seed();
+        $admin = $this->admin();
+        $cycle = $this->cycle();
+
+        $this->actingAs($admin)
+            ->get(route('payroll.index'))
+            ->assertOk()
+            ->assertSee(route('payroll.show', $cycle))
+            ->assertDontSee(route('payroll.export.mudad', $cycle));
+
+        foreach (['under_review', 'approved', 'locked'] as $status) {
+            $cycle->fresh()->transitionTo($status, $admin);
+        }
+
+        $this->actingAs($admin)
+            ->get(route('payroll.index'))
+            ->assertOk()
+            ->assertSee(route('payroll.show', $cycle))
+            ->assertSee(route('payroll.export.mudad', $cycle));
+    }
+
     public function test_skipping_states_is_rejected(): void
     {
         $this->seed();

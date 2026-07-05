@@ -3,6 +3,15 @@
 @section('title', 'الرواتب')
 
 @section('content')
+    @php
+        $statusMeta = [
+            'draft' => ['label' => 'مسودة', 'class' => 'bg-surface-container text-on-surface-variant'],
+            'under_review' => ['label' => 'قيد المراجعة', 'class' => 'bg-yellow-100 text-yellow-800'],
+            'approved' => ['label' => 'معتمد', 'class' => 'bg-blue-100 text-blue-800'],
+            'locked' => ['label' => 'مقفل', 'class' => 'bg-green-100 text-green-800'],
+        ];
+    @endphp
+
     <div class="mx-auto max-w-7xl space-y-6">
         <section class="flex flex-col justify-between gap-4 rounded-3xl border border-outline-variant/50 bg-white p-6 shadow-[0_16px_38px_rgba(25,28,30,0.05)] md:flex-row md:items-end">
             <div>
@@ -19,14 +28,21 @@
                 </p>
             </div>
             <div class="flex flex-wrap gap-3">
-                <button class="flex items-center gap-2 rounded-xl bg-secondary-container px-5 py-3 font-bold text-on-secondary-container shadow-sm transition hover:opacity-90 active:scale-95">
-                    <span class="material-symbols-outlined">download</span>
-                    <span>تصدير ملف WPS</span>
-                </button>
-                <button class="flex items-center gap-2 rounded-xl bg-primary-container px-5 py-3 font-bold text-on-primary shadow-sm transition hover:opacity-90 active:scale-95">
+                @if($exportableCycle)
+                    <a href="{{ route('payroll.export.mudad', $exportableCycle) }}" class="flex items-center gap-2 rounded-xl bg-secondary-container px-5 py-3 font-bold text-on-secondary-container shadow-sm transition hover:opacity-90 active:scale-95">
+                        <span class="material-symbols-outlined">download</span>
+                        <span>تصدير ملف WPS</span>
+                    </a>
+                @else
+                    <span class="flex cursor-not-allowed items-center gap-2 rounded-xl bg-surface-container px-5 py-3 font-bold text-on-surface-variant shadow-sm" title="يتاح التصدير بعد قفل مسير الرواتب">
+                        <span class="material-symbols-outlined">lock</span>
+                        <span>تصدير ملف WPS</span>
+                    </span>
+                @endif
+                <a href="{{ $currentCycle ? route('payroll.show', $currentCycle) : '#payroll-cycles' }}" class="flex items-center gap-2 rounded-xl bg-primary-container px-5 py-3 font-bold text-on-primary shadow-sm transition hover:opacity-90 active:scale-95">
                     <span class="material-symbols-outlined">play_arrow</span>
-                    <span>تشغيل الرواتب</span>
-                </button>
+                    <span>{{ $currentCycle ? 'فتح مسير الرواتب' : 'لا يوجد مسير حالي' }}</span>
+                </a>
             </div>
         </section>
 
@@ -35,7 +51,7 @@
                 ['label' => 'صافي الرواتب', 'value' => number_format($summary['net'], 2).' ر.س', 'caption' => 'صافي مستحقات الموظفين', 'icon' => 'payments', 'tone' => 'bg-primary-fixed text-primary'],
                 ['label' => 'إجمالي الرواتب', 'value' => number_format($summary['gross'], 2).' ر.س', 'caption' => 'قبل الاستقطاعات والبدلات', 'icon' => 'account_balance_wallet', 'tone' => 'bg-secondary-fixed text-secondary'],
                 ['label' => 'إجمالي الاستقطاعات', 'value' => number_format($summary['deductions'] + $summary['gosi'], 2).' ر.س', 'caption' => 'تشمل التأمينات والاستقطاعات', 'icon' => 'trending_down', 'tone' => 'bg-error-container text-error'],
-                ['label' => 'حالة ملف WPS', 'value' => $currentCycle ? 'جاهز للإرسال' : 'غير متاح', 'caption' => 'عدد الموظفين '.$summary['employees'], 'icon' => 'verified', 'tone' => 'bg-green-100 text-green-700'],
+                ['label' => 'حالة ملف WPS', 'value' => $exportableCycle ? 'جاهز للتصدير' : 'بانتظار القفل', 'caption' => 'عدد الموظفين '.$summary['employees'], 'icon' => 'verified', 'tone' => $exportableCycle ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800'],
             ] as $metric)
                 <div class="app-kpi-card p-5">
                     <div class="flex items-start justify-between gap-4">
@@ -90,9 +106,16 @@
                                 <td class="px-6 py-4 text-end font-tabular text-green-600">+{{ number_format($allowances, 2) }}</td>
                                 <td class="px-6 py-4 text-end font-tabular text-error">-{{ number_format($item->total_deductions + $item->social_insurance_saudi, 2) }}</td>
                                 <td class="px-6 py-4 text-end font-tabular font-black">{{ number_format($item->net_salary, 2) }}</td>
-                                <td class="px-6 py-4"><span class="app-status-chip bg-green-100 text-green-700">جاهز</span></td>
+                                <td class="px-6 py-4"><span class="app-status-chip {{ $statusMeta[$currentCycle->status]['class'] ?? 'bg-surface-container text-on-surface-variant' }}">{{ $statusMeta[$currentCycle->status]['label'] ?? $currentCycle->status }}</span></td>
                                 <td class="px-6 py-4 text-center">
-                                    <button class="rounded-full p-2 transition-colors hover:bg-surface-container"><span class="material-symbols-outlined text-primary">visibility</span></button>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ route('payroll.show', $currentCycle) }}" class="rounded-full p-2 transition-colors hover:bg-surface-container" title="عرض المسير">
+                                            <span class="material-symbols-outlined text-primary">visibility</span>
+                                        </a>
+                                        <a href="{{ route('payroll.payslip', [$currentCycle, $item]) }}" class="rounded-full p-2 transition-colors hover:bg-surface-container" title="قسيمة الراتب">
+                                            <span class="material-symbols-outlined text-primary">receipt_long</span>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -103,7 +126,7 @@
             </div>
         </section>
 
-        <section class="app-card overflow-hidden">
+        <section id="payroll-cycles" class="app-card overflow-hidden">
             <div class="border-b border-outline-variant/50 bg-white p-5">
                 <h3 class="flex items-center gap-2 text-lg font-black text-on-surface">
                     <span class="material-symbols-outlined text-primary">history</span>
@@ -134,7 +157,7 @@
                                 <td class="px-6 py-4 font-tabular">{{ number_format($cycle->items_sum_gross_total ?? 0, 2) }}</td>
                                 <td class="px-6 py-4 font-tabular">{{ number_format($cycle->items_sum_total_deductions ?? 0, 2) }}</td>
                                 <td class="px-6 py-4 font-tabular font-black text-on-surface">{{ number_format($cycle->items_sum_net_salary ?? 0, 2) }}</td>
-                                <td class="px-6 py-4"><span class="app-status-chip bg-surface-container text-primary">{{ $cycle->status }}</span></td>
+                                <td class="px-6 py-4"><span class="app-status-chip {{ $statusMeta[$cycle->status]['class'] ?? 'bg-surface-container text-on-surface-variant' }}">{{ $statusMeta[$cycle->status]['label'] ?? $cycle->status }}</span></td>
                             </tr>
                         @empty
                             <tr><td colspan="7" class="px-6 py-12 text-center text-on-surface-variant">لا توجد دورات رواتب</td></tr>

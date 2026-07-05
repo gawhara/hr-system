@@ -664,6 +664,39 @@ Architecture-consistent decisions made during the build, newest batch
 first. Follow these patterns when extending the system; don't reinvent
 them per module.
 
+### 2026-07-05 — Employee PRD closure audit + native spreadsheet import/export
+
+Employee Module PRD audit outcome after implementing the spreadsheet
+workflow:
+
+* **CLOSED — FR-007 Import from Excel.** `POST /employees/import`
+accepts native `.xlsx` files and legacy `.csv` files. Imports use the
+same flat `employees` architecture, company scoping, duplicate checks,
+encrypted/hash identity behavior, and validation vocabulary as the
+manual create/edit flow. Imports create new employees only; they do not
+silently update existing employees.
+* **CLOSED — FR-008 Export Employees.** `GET /employees/export` exports
+the filtered employee directory. `?format=xlsx` produces native Excel;
+CSV remains supported as a compatibility fallback. The UI defaults to
+native Excel.
+* **CLOSED — Import template.** `GET /employees/import-template` returns
+the exact accepted column set; `?format=xlsx` is the default UI path and
+CSV is still available by omitting the format parameter.
+* **Dependency decision:** use `openspout/openspout v4.28.5` instead of
+`maatwebsite/excel`. Reason: this XAMPP PHP is 8.2.12 and `ext-gd` is
+not enabled; current Laravel Excel / PhpSpreadsheet resolution either
+requires PHP 8.3+ or GD. OpenSpout supports native XLSX read/write on
+PHP 8.2 with the enabled extensions (`zip`, `xmlreader`, `dom`) and
+keeps the workflow offline-friendly.
+* **Still intentionally deferred from the Bayzat PRD:** admin REST API
+(§14 / Sanctum, Phase 5), assets tab/module, performance tab/module,
+server-side employee profile print/PDF, and Super Admin soft-delete
+workflow. These are not required to close the employee master-data MVP
+and would add routes/modules beyond the current safe scope.
+* **Architecture adaptations remain:** no 1:1 satellite employee tables;
+the PRD groupings live as tabs/sections over the existing flat
+`employees` table so sync, encryption, audit, and imports stay coherent.
+
 ### 2026-07-04 — PRD Employee Module (Bayzat reference) adoption + GitHub backup
 
 Outcome of reviewing `PRD_Employee_Module_HRMS_Bayzat_Reference_EN.docx`
@@ -713,9 +746,11 @@ probation end after contract start.
 * **Directory data-quality cards** (probation / expired iqama /
 incomplete <75%) and branch/department/status/contract-type filters on
 the employee list.
-* **Deferred from the PRD:** Excel import/export (maatwebsite/excel not
-yet installed), assets module, admin REST API (§14 — Sanctum is
-Phase 5), hr_officer/viewer/department_manager roles.
+* **Deferred from the PRD at the time:** Excel import/export, assets
+module, admin REST API (§14 — Sanctum is Phase 5),
+hr_officer/viewer/department_manager roles. Excel import/export was
+later closed on 2026-07-05 with OpenSpout native XLSX support; see the
+newer Decision Log entry.
 * **Backup:** the canonical off-machine backup is the GitHub remote
 `https://github.com/gawhara/hr-system` (`origin`, branch `main`). Keep
 it current after significant milestones.

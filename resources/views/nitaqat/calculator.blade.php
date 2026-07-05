@@ -4,7 +4,7 @@
 
 @php
     $bandStyles = [
-        'platinum' => ['label' => 'بلاتيني', 'box' => 'bg-blue-50 text-blue-800 ring-blue-200', 'bar' => 'from-blue-600 to-violet-400'],
+        'platinum' => ['label' => 'بلاتيني', 'box' => 'bg-blue-50 text-blue-800 ring-blue-200', 'bar' => 'from-[#1a2b4b] to-[#d4af37]'],
         'high_green' => ['label' => 'أخضر مرتفع', 'box' => 'bg-emerald-50 text-emerald-800 ring-emerald-200', 'bar' => 'from-emerald-700 to-emerald-400'],
         'low_green' => ['label' => 'أخضر منخفض', 'box' => 'bg-lime-50 text-lime-800 ring-lime-200', 'bar' => 'from-lime-600 to-lime-300'],
         'yellow' => ['label' => 'أصفر', 'box' => 'bg-amber-50 text-amber-800 ring-amber-200', 'bar' => 'from-amber-500 to-yellow-300'],

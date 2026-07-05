@@ -8,16 +8,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .login-input:focus-within {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16);
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
         }
     </style>
 </head>
-<body class="min-h-screen overflow-hidden bg-[#fbf7ff] text-[#1d1730]">
+<body class="min-h-screen overflow-hidden bg-[#f9f9ff] text-[#1b1b1f]">
     <div class="flex min-h-screen items-stretch">
-        <main class="relative z-10 flex w-full flex-col bg-white/92 p-8 shadow-[0_28px_70px_rgba(88,28,135,0.18)] backdrop-blur-xl md:p-16 lg:w-[450px] xl:w-[550px]">
+        <main class="relative z-10 flex w-full flex-col bg-white/92 p-8 shadow-[0_28px_70px_rgba(26,43,75,0.18)] backdrop-blur-xl md:p-16 lg:w-[450px] xl:w-[550px]">
             <div class="absolute left-8 top-8">
-                <button type="button" class="flex items-center gap-2 text-sm font-bold text-[#6d28d9] transition-colors hover:text-[#a21caf]">
+                <button type="button" class="flex items-center gap-2 text-sm font-bold text-[#1a2b4b] transition-colors hover:text-[#d4af37]">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <circle cx="12" cy="12" r="9"></circle>
                         <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.6 8.2 12S9.5 18.4 12 21"></path>
@@ -29,18 +29,18 @@
             <div class="mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center">
                 <div class="mb-12">
                     <div class="mb-8 flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#6d28d9] via-[#8b5cf6] to-[#d946ef] shadow-lg shadow-purple-950/20">
-                            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#f4df96] via-[#d4af37] to-[#b68e17] shadow-lg shadow-[#1a2b4b]/15">
+                            <svg class="h-5 w-5 text-[#1a2b4b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path>
                                 <path d="M16 8h2a2 2 0 0 1 2 2v11"></path>
                                 <path d="M8 7h4M8 11h4M8 15h4M4 21h16"></path>
                             </svg>
                         </div>
-                        <span class="text-lg font-bold tracking-tight text-[#5b21b6]">SMARS HR</span>
+                        <span class="text-lg font-bold tracking-tight text-[#1a2b4b]">SMARS HR</span>
                     </div>
 
-                    <h1 class="mb-2 text-2xl font-bold text-[#1d1730]">تسجيل الدخول</h1>
-                    <p class="text-base leading-7 text-[#5b5370]">مرحباً بك في نظام إدارة الموارد البشرية</p>
+                    <h1 class="mb-2 text-2xl font-bold text-[#1b1b1f]">تسجيل الدخول</h1>
+                    <p class="text-base leading-7 text-[#44474e]">مرحباً بك في نظام إدارة الموارد البشرية</p>
                 </div>
 
                 @if($errors->any())
@@ -53,9 +53,9 @@
                     @csrf
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-[#1d1730]" for="email">البريد الإلكتروني</label>
-                        <div class="login-input relative flex items-center rounded-lg border border-[#d8c4ee] bg-white/80 transition-all duration-200">
-                            <svg class="absolute right-4 h-5 w-5 text-[#776b91]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <label class="block text-sm font-semibold text-[#1b1b1f]" for="email">البريد الإلكتروني</label>
+                        <div class="login-input relative flex items-center rounded-lg border border-[#d3daea] bg-white/80 transition-all duration-200">
+                            <svg class="absolute right-4 h-5 w-5 text-[#44474e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <path d="M4 6h16v12H4z"></path>
                                 <path d="m4 7 8 6 8-6"></path>
                             </svg>
@@ -67,7 +67,7 @@
                                 value="{{ old('email', 'admin@hr.local') }}"
                                 autocomplete="username"
                                 placeholder="name@company.com"
-                                class="w-full rounded-lg border-none bg-transparent py-3 pl-4 pr-12 text-left text-base text-[#1d1730] outline-none focus:ring-0"
+                                class="w-full rounded-lg border-none bg-transparent py-3 pl-4 pr-12 text-left text-base text-[#1b1b1f] outline-none focus:ring-0"
                                 required
                                 autofocus
                             >
@@ -76,11 +76,11 @@
 
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                            <label class="block text-sm font-semibold text-[#1d1730]" for="password">كلمة المرور</label>
-                            <button type="button" class="text-sm font-semibold text-[#6d28d9] transition-colors hover:text-[#a21caf]">نسيت كلمة المرور؟</button>
+                            <label class="block text-sm font-semibold text-[#1b1b1f]" for="password">كلمة المرور</label>
+                            <button type="button" class="text-sm font-semibold text-[#1a2b4b] transition-colors hover:text-[#d4af37]">نسيت كلمة المرور؟</button>
                         </div>
-                        <div class="login-input relative flex items-center rounded-lg border border-[#d8c4ee] bg-white/80 transition-all duration-200">
-                            <svg class="absolute right-4 h-5 w-5 text-[#776b91]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <div class="login-input relative flex items-center rounded-lg border border-[#d3daea] bg-white/80 transition-all duration-200">
+                            <svg class="absolute right-4 h-5 w-5 text-[#44474e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <rect x="5" y="10" width="14" height="10" rx="2"></rect>
                                 <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
                             </svg>
@@ -91,10 +91,10 @@
                                 value="password"
                                 autocomplete="current-password"
                                 placeholder="••••••••"
-                                class="w-full rounded-lg border-none bg-transparent py-3 pl-12 pr-12 text-base text-[#1d1730] outline-none focus:ring-0"
+                                class="w-full rounded-lg border-none bg-transparent py-3 pl-12 pr-12 text-base text-[#1b1b1f] outline-none focus:ring-0"
                                 required
                             >
-                            <button id="togglePassword" class="absolute left-4 text-[#776b91] transition-colors hover:text-[#6d28d9]" type="button" aria-label="إظهار كلمة المرور">
+                            <button id="togglePassword" class="absolute left-4 text-[#44474e] transition-colors hover:text-[#d4af37]" type="button" aria-label="إظهار كلمة المرور">
                                 <svg id="eyeIcon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
@@ -104,11 +104,11 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <input class="h-4 w-4 rounded border-[#d8c4ee] text-[#6d28d9] focus:ring-[#8b5cf6]" id="remember" name="remember" type="checkbox">
-                        <label class="cursor-pointer text-sm text-[#5b5370]" for="remember">تذكرني على هذا الجهاز</label>
+                        <input class="h-4 w-4 rounded border-[#d3daea] text-[#1a2b4b] focus:ring-[#d4af37]" id="remember" name="remember" type="checkbox">
+                        <label class="cursor-pointer text-sm text-[#44474e]" for="remember">تذكرني على هذا الجهاز</label>
                     </div>
 
-                    <button class="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-l from-[#6d28d9] via-[#8b5cf6] to-[#d946ef] py-4 text-base font-bold text-white shadow-lg shadow-purple-950/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-purple-950/30 active:scale-[0.99]" type="submit">
+                    <button class="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-l from-[#d4af37] via-[#e1c767] to-[#b68e17] py-4 text-base font-bold text-[#1a2b4b] shadow-lg shadow-[#d4af37]/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[#d4af37]/30 active:scale-[0.99]" type="submit">
                         <span>دخول</span>
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M10 17 5 12l5-5"></path>
@@ -117,12 +117,12 @@
                     </button>
                 </form>
 
-                <div class="mt-12 border-t border-[#d8c4ee] pt-8 text-center">
-                    <p class="text-sm text-[#5b5370]">
+                <div class="mt-12 border-t border-[#d3daea] pt-8 text-center">
+                    <p class="text-sm text-[#44474e]">
                         تواجه مشكلة؟
-                        <span class="font-bold text-[#6d28d9]">تواصل مع الدعم الفني</span>
+                        <span class="font-bold text-[#1a2b4b]">تواصل مع الدعم الفني</span>
                     </p>
-                    <div class="mt-4 rounded-lg bg-[#f6efff] p-3 text-left text-sm font-semibold text-[#5b5370] ring-1 ring-[#d8c4ee]" dir="ltr">
+                    <div class="mt-4 rounded-lg bg-[#f9f9ff] p-3 text-left text-sm font-semibold text-[#44474e] ring-1 ring-[#d3daea]" dir="ltr">
                         <div>admin@hr.local</div>
                         <div>password</div>
                     </div>
@@ -130,28 +130,28 @@
             </div>
 
             <div class="mt-auto text-center">
-                <p class="text-sm text-[#776b91]">© 2026 SMARS HR. All rights reserved.</p>
+                <p class="text-sm text-[#44474e]">© 2026 SMARS HR. All rights reserved.</p>
             </div>
         </main>
 
-        <section class="relative hidden flex-1 items-center justify-center overflow-hidden bg-[#2e1065] lg:flex">
+        <section class="relative hidden flex-1 items-center justify-center overflow-hidden bg-[#1a2b4b] lg:flex">
             <div class="absolute inset-0 z-0">
                 <div class="h-full w-full bg-cover bg-center" style="background-image: url('{{ asset('images/login-office.jpg') }}')"></div>
-                <div class="absolute inset-0 bg-gradient-to-br from-[#2e1065]/92 via-[#6d28d9]/68 to-[#d946ef]/18"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-[#1a2b4b]/94 via-[#243b63]/72 to-[#d4af37]/22"></div>
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
             </div>
 
             <div class="relative z-10 max-w-2xl p-16 text-right">
                 <div class="mb-8 inline-block rounded-full border border-white/10 bg-white/12 px-4 py-2 backdrop-blur-md">
-                    <span class="flex items-center gap-2 text-xs font-bold tracking-widest text-[#ddd6fe]">
-                        <span class="h-2 w-2 animate-pulse rounded-full bg-[#f0abfc]"></span>
+                    <span class="flex items-center gap-2 text-xs font-bold tracking-widest text-[#f4df96]">
+                        <span class="h-2 w-2 animate-pulse rounded-full bg-[#d4af37]"></span>
                         نظام متوافق مع رؤية 2030
                     </span>
                 </div>
 
                 <h2 class="mb-8 text-[48px] font-extrabold leading-tight text-white">
                     نقلة نوعية في <br>
-                    <span class="text-[#f0abfc]">إدارة الموارد البشرية</span>
+                    <span class="text-[#d4af37]">إدارة الموارد البشرية</span>
                 </h2>
 
                 <div class="grid grid-cols-1 gap-6">
@@ -162,13 +162,13 @@
                     ] as [$title, $body, $path])
                         <div class="flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/10">
                             <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-white/12">
-                                <svg class="h-6 w-6 text-[#f0abfc]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <svg class="h-6 w-6 text-[#d4af37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="{{ $path }}"></path>
                                 </svg>
                             </div>
                             <div>
                                 <h3 class="mb-1 text-lg font-bold text-white">{{ $title }}</h3>
-                                <p class="text-sm leading-6 text-[#ddd6fe]/88">{{ $body }}</p>
+                                <p class="text-sm leading-6 text-[#f4df96]/88">{{ $body }}</p>
                             </div>
                         </div>
                     @endforeach

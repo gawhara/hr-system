@@ -29,50 +29,53 @@
     --font-body-md: 'Cairo', 'Inter', sans-serif;
     --font-body-sm: 'Cairo', 'Inter', sans-serif;
     --font-label-caps: 'Inter', 'Cairo', sans-serif;
-    --color-surface: #f7f9fb;
-    --color-background: #f7f9fb;
-    --color-on-background: #191c1e;
-    --color-on-surface: #191c1e;
-    --color-on-surface-variant: #494550;
+    --color-surface: #f9f9ff;
+    --color-background: #f9f9ff;
+    --color-on-background: #1b1b1f;
+    --color-on-surface: #1b1b1f;
+    --color-on-surface-variant: #44474e;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f2f4f6;
-    --color-surface-container: #eceef0;
-    --color-surface-container-high: #e6e8ea;
-    --color-surface-container-highest: #e0e3e5;
-    --color-surface-dim: #d8dadc;
-    --color-outline: #7a7582;
-    --color-outline-variant: #cbc4d2;
-    --color-primary: #170040;
+    --color-surface-container-low: #f2f5fb;
+    --color-surface-container: #e9edf7;
+    --color-surface-container-high: #e1e7f2;
+    --color-surface-container-highest: #d3daea;
+    --color-surface-dim: #d3daea;
+    --color-outline: #6f7787;
+    --color-outline-variant: #d3daea;
+    --color-primary: #1a2b4b;
     --color-on-primary: #ffffff;
-    --color-primary-container: #2e1065;
-    --color-on-primary-container: #987ed4;
-    --color-primary-fixed: #eaddff;
-    --color-primary-fixed-dim: #d1bcff;
-    --color-on-primary-fixed: #24005b;
-    --color-on-primary-fixed-variant: #503788;
-    --color-secondary: #6b38d4;
-    --color-on-secondary: #ffffff;
-    --color-secondary-container: #8455ef;
-    --color-on-secondary-container: #fffbff;
-    --color-secondary-fixed: #e9ddff;
-    --color-secondary-fixed-dim: #d0bcff;
-    --color-on-secondary-fixed: #23005c;
-    --color-on-secondary-fixed-variant: #5516be;
-    --color-tertiary: #24002b;
+    --color-primary-container: #243b63;
+    --color-on-primary-container: #ffffff;
+    --color-primary-fixed: #e6edf8;
+    --color-primary-fixed-dim: #d3daea;
+    --color-on-primary-fixed: #1a2b4b;
+    --color-on-primary-fixed-variant: #243b63;
+    --color-secondary: #d4af37;
+    --color-on-secondary: #1a2b4b;
+    --color-secondary-container: #d4af37;
+    --color-on-secondary-container: #1a2b4b;
+    --color-secondary-fixed: #fff5d6;
+    --color-secondary-fixed-dim: #f4df96;
+    --color-on-secondary-fixed: #3f3100;
+    --color-on-secondary-fixed-variant: #7a5c00;
+    --color-tertiary: #0288d1;
     --color-on-tertiary: #ffffff;
-    --color-tertiary-container: #460051;
-    --color-on-tertiary-container: #dc49f2;
-    --color-tertiary-fixed: #ffd6fd;
-    --color-tertiary-fixed-dim: #fbabff;
-    --color-on-tertiary-fixed: #36003e;
-    --color-on-tertiary-fixed-variant: #7c008e;
-    --color-inverse-surface: #2d3133;
-    --color-inverse-on-surface: #eff1f3;
-    --color-inverse-primary: #d1bcff;
-    --color-error: #ba1a1a;
+    --color-tertiary-container: #d8efff;
+    --color-on-tertiary-container: #00344f;
+    --color-tertiary-fixed: #d8efff;
+    --color-tertiary-fixed-dim: #a9d8f5;
+    --color-on-tertiary-fixed: #00344f;
+    --color-on-tertiary-fixed-variant: #006399;
+    --color-inverse-surface: #1a2b4b;
+    --color-inverse-on-surface: #ffffff;
+    --color-inverse-primary: #d4af37;
+    --color-error: #d32f2f;
     --color-on-error: #ffffff;
     --color-error-container: #ffdad6;
     --color-on-error-container: #93000a;
+    --color-success: #2e7d32;
+    --color-warning: #fbc02d;
+    --color-info: #0288d1;
     --spacing-sidebar-width: 280px;
     --spacing-md: 24px;
     --spacing-lg: 40px;
@@ -87,17 +90,17 @@
     --font-size-label-caps: 12px;
     --radius-xl: 1.5rem;
     --radius-lg: 1rem;
-    --shadow-purple-soft: 0 20px 45px rgba(46, 16, 101, 0.12);
-    --shadow-purple-card: 0 4px 18px rgba(25, 28, 30, 0.06);
+    --shadow-brand-soft: 0 20px 45px rgba(26, 43, 75, 0.12);
+    --shadow-brand-card: 0 4px 18px rgba(26, 43, 75, 0.07);
 }
 
 @layer base {
     body {
         font-family: 'Cairo', 'Inter', ui-sans-serif, system-ui, sans-serif;
         background:
-            radial-gradient(circle at 12% 6%, rgba(105, 80, 162, 0.08), transparent 28%),
-            linear-gradient(180deg, #f7f9fb 0%, #f2f4f6 52%, #ffffff 100%);
-        color: #191c1e;
+            radial-gradient(circle at 12% 6%, rgba(212, 175, 55, 0.10), transparent 28%),
+            linear-gradient(180deg, #f9f9ff 0%, #f2f5fb 52%, #ffffff 100%);
+        color: #1b1b1f;
     }
 
     .material-symbols-outlined {
@@ -129,32 +132,32 @@
 @layer components {
     .glass-card {
         background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(203, 196, 210, 0.54);
-        box-shadow: var(--shadow-purple-card);
+        border: 1px solid rgba(211, 218, 234, 0.74);
+        box-shadow: var(--shadow-brand-card);
         backdrop-filter: blur(14px);
     }
 
     .stitch-card {
         background: #ffffff;
-        border: 1px solid rgba(203, 196, 210, 0.48);
+        border: 1px solid rgba(211, 218, 234, 0.70);
         border-radius: 1rem;
-        box-shadow: var(--shadow-purple-card);
+        box-shadow: var(--shadow-brand-card);
     }
 
     .app-shell {
-        background: linear-gradient(180deg, rgba(247, 249, 251, 0.96), rgba(242, 244, 246, 0.96));
+        background: linear-gradient(180deg, rgba(249, 249, 255, 0.96), rgba(242, 245, 251, 0.96));
     }
 
     .app-card {
         background: #ffffff;
-        border: 1px solid rgba(203, 196, 210, 0.46);
+        border: 1px solid rgba(211, 218, 234, 0.72);
         border-radius: 1rem;
-        box-shadow: var(--shadow-purple-card);
+        box-shadow: var(--shadow-brand-card);
     }
 
     .app-kpi-card {
-        background: linear-gradient(145deg, #ffffff, #f7f9fb);
-        border: 1px solid rgba(203, 196, 210, 0.42);
+        background: linear-gradient(145deg, #ffffff, #f9f9ff);
+        border: 1px solid rgba(211, 218, 234, 0.68);
         border-radius: 1.5rem;
         box-shadow: 0 12px 30px rgba(25, 28, 30, 0.06);
     }
@@ -166,8 +169,8 @@
     }
 
     .app-table thead {
-        background: #f2f4f6;
-        color: #494550;
+        background: #f2f5fb;
+        color: #44474e;
         position: sticky;
         top: 0;
         z-index: 1;
@@ -197,7 +200,7 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #c4b5fd;
+        background: #d4af37;
         border-radius: 10px;
     }
 
@@ -211,57 +214,57 @@
         gap: 0.75rem;
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
-        color: #5b5370;
+        color: #44474e;
         transition: all 160ms ease;
     }
 
     .stitch-nav-link:hover {
-        background: #efe4ff;
-        color: #6d28d9;
+        background: #fff5d6;
+        color: #1a2b4b;
     }
 
     .stitch-nav-link-active {
-        background: #ede9fe;
-        color: #6d28d9;
+        background: #fff5d6;
+        color: #1a2b4b;
         font-weight: 700;
     }
 
     .stitch-btn-primary {
         border-radius: 0.75rem;
-        background: linear-gradient(135deg, #6d28d9, #8b5cf6 52%, #d946ef);
-        color: #fff;
+        background: linear-gradient(135deg, #d4af37, #e1c767 52%, #b68e17);
+        color: #1a2b4b;
         font-weight: 700;
-        box-shadow: 0 16px 30px rgba(109, 40, 217, 0.24);
+        box-shadow: 0 16px 30px rgba(212, 175, 55, 0.24);
         transition: all 160ms ease;
     }
 
     .stitch-btn-primary:hover {
         transform: translateY(-1px);
-        box-shadow: 0 20px 36px rgba(109, 40, 217, 0.30);
+        box-shadow: 0 20px 36px rgba(212, 175, 55, 0.30);
     }
 
     .stitch-input {
         border-radius: 0.5rem;
-        border: 1px solid #cbc4d2;
+        border: 1px solid #d3daea;
         background: rgba(255, 255, 255, 0.9);
         transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
 
     .stitch-input:focus {
-        border-color: #6b38d4;
+        border-color: #d4af37;
         background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(107, 56, 212, 0.16);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.20);
         outline: none;
     }
 }
 
 @layer utilities {
     .bg-primary {
-        background: linear-gradient(135deg, #170040, #2e1065 52%, #6b38d4);
+        background: linear-gradient(135deg, #1a2b4b, #243b63 58%, #d4af37);
     }
 
     .bg-primary-container {
-        background: linear-gradient(135deg, #2e1065, #8455ef);
+        background: linear-gradient(135deg, #243b63, #1a2b4b);
     }
 
     .font-tabular {

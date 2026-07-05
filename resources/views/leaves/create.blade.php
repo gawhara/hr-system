@@ -5,7 +5,7 @@
 @section('content')
     <div class="mx-auto max-w-3xl space-y-6">
         <section class="overflow-hidden rounded-3xl border border-outline-variant/50 bg-white shadow-[0_16px_38px_rgba(25,28,30,0.05)]">
-            <div class="flex items-center justify-between bg-gradient-to-br from-[#170040] via-[#2e1065] to-[#6b38d4] p-6 text-white">
+            <div class="flex items-center justify-between bg-gradient-to-br from-[#1a2b4b] via-[#243b63] to-[#0f1d33] p-6 text-white">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-white/60">Leave Request</p>
                     <h2 class="mt-1 text-2xl font-black">طلب إجازة جديد</h2>

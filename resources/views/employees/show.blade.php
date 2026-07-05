@@ -9,9 +9,9 @@
         @endif
 
         <div class="overflow-hidden rounded-3xl border border-outline-variant/50 bg-white shadow-[0_18px_44px_rgba(25,28,30,0.06)]">
-            <div class="relative overflow-hidden bg-gradient-to-br from-[#170040] via-[#2e1065] to-[#6b38d4] p-6 text-white sm:p-8">
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1a2b4b] via-[#243b63] to-[#0f1d33] p-6 text-white sm:p-8">
                 <div class="absolute -top-24 end-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
-                <div class="absolute -bottom-28 start-8 h-72 w-72 rounded-full bg-[#dc49f2]/18 blur-3xl"></div>
+                <div class="absolute -bottom-28 start-8 h-72 w-72 rounded-full bg-[#d4af37]/20 blur-3xl"></div>
                 <div class="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div class="flex items-center gap-5">
                         <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-white/18 bg-white/12 text-4xl font-black ring-1 ring-white/12">
@@ -54,7 +54,7 @@
                                 </form>
                             </details>
                         @endcan
-                        <span class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-primary shadow-[0_14px_28px_rgba(23,0,64,0.18)]">
+                        <span class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-primary shadow-[0_14px_28px_rgba(26,43,75,0.18)]">
                             <span class="h-2 w-2 rounded-full bg-green-500"></span>
                             {{ \App\Models\Employee::STATUS_LABELS_AR[$employee->status] ?? $employee->status }}
                         </span>
@@ -102,7 +102,7 @@
             }
         @endphp
 
-        <div class="app-card sticky top-[88px] z-30 p-2" data-tabs>
+        <div class="app-card p-2" data-tabs>
             <nav class="flex gap-1 overflow-x-auto">
                 @foreach($tabs as $key => [$label, $icon])
                     <button type="button" data-tab-trigger="{{ $key }}"

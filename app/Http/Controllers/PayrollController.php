@@ -35,9 +35,18 @@ class PayrollController extends Controller
             ? $currentCycle->items()->with(['employee.position'])->limit(10)->get()
             : collect();
 
+        $exportableCycle = PayrollCycle::query()
+            ->where('company_id', $companyId)
+            ->where('status', PayrollCycle::STATUS_LOCKED)
+            ->latest('year')
+            ->latest('month')
+            ->latest('run_sequence')
+            ->first();
+
         return view('payroll.index', [
             'cycles' => $cycles,
             'currentCycle' => $currentCycle,
+            'exportableCycle' => $exportableCycle,
             'items' => $items,
             'summary' => [
                 'gross' => $items->sum('gross_total'),

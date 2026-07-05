@@ -31,10 +31,10 @@
         @endphp
 
         <div class="flex min-h-screen overflow-hidden">
-            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-gradient-to-b from-[#1e1038] via-[#2e1065] to-[#581c87] text-white shadow-[0_24px_56px_rgba(46,16,101,0.28)] lg:flex">
+            <aside class="fixed inset-y-0 start-0 z-50 hidden w-sidebar-width flex-col bg-gradient-to-b from-[#1a2b4b] via-[#243b63] to-[#0f1d33] text-white shadow-[0_24px_56px_rgba(26,43,75,0.28)] lg:flex">
                 <div class="flex flex-col gap-sm p-md">
                     <div class="flex items-center gap-3 py-sm">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#d1bcff] via-[#8455ef] to-[#dc49f2] text-white shadow-[0_14px_28px_rgba(132,85,239,0.32)]">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#f4df96] via-[#d4af37] to-[#b68e17] text-[#1a2b4b] shadow-[0_14px_28px_rgba(212,175,55,0.28)]">
                             <span class="material-symbols-outlined fill">domain</span>
                         </div>
                         <div>
@@ -47,7 +47,7 @@
 
                 <nav class="custom-scrollbar flex-1 space-y-1.5 overflow-y-auto px-sm py-md">
                     @foreach($navLinks as [$pattern, $route, $label, $icon])
-                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-lg border-s-4 px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'border-[#d1bcff] bg-white/12 font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]' : 'border-transparent text-white/70 hover:bg-white/10 hover:text-white' }}">
+                        <a href="{{ route($route) }}" class="flex items-center gap-3 rounded-lg border-s-4 px-4 py-3 transition-all active:scale-95 {{ request()->routeIs($pattern) ? 'border-[#d4af37] bg-white/12 font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]' : 'border-transparent text-white/70 hover:bg-white/10 hover:text-white' }}">
                             <span class="material-symbols-outlined {{ request()->routeIs($pattern) ? 'fill' : '' }}">{{ $icon }}</span>
                             <span class="text-body-md">{{ $label }}</span>
                         </a>

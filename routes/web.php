@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/nitaqat/calculator', [NitaqatController::class, 'index'])->name('nitaqat.calculator');
     Route::post('/nitaqat/calculator', [NitaqatController::class, 'calculate'])->name('nitaqat.calculate');
     Route::get('/employees/export', [EmployeeSpreadsheetController::class, 'export'])->name('employees.export');
+    Route::get('/employees/import-template', [EmployeeSpreadsheetController::class, 'template'])->name('employees.import-template');
     Route::post('/employees/import', [EmployeeSpreadsheetController::class, 'import'])->name('employees.import');
     Route::resource('employees', EmployeeController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);
     Route::post('/employees/{employee}/status', [EmployeeController::class, 'updateStatus'])->name('employees.status');
