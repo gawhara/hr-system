@@ -4,21 +4,23 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyContextController;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\EmployeeDocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeDocumentController;
+use App\Http\Controllers\EmployeeSpreadsheetController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\NitaqatController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ReportsController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::post('/locale', function (\Illuminate\Http\Request $request) {
+Route::post('/locale', function (Request $request) {
     $locale = $request->validate(['locale' => ['required', 'in:ar,en']])['locale'];
 
     $request->session()->put('locale', $locale);
@@ -35,7 +37,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::post('/company-context', [CompanyContextController::class, 'update'])->name('company-context.update');
-    Route::post('/notifications/read-all', function (\Illuminate\Http\Request $request) {
+    Route::post('/notifications/read-all', function (Request $request) {
         $request->user()->unreadNotifications->markAsRead();
 
         return back();
@@ -44,6 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/companies/{company}', [DashboardController::class, 'showCompany'])->name('dashboard.companies.show');
     Route::get('/nitaqat/calculator', [NitaqatController::class, 'index'])->name('nitaqat.calculator');
     Route::post('/nitaqat/calculator', [NitaqatController::class, 'calculate'])->name('nitaqat.calculate');
+    Route::get('/employees/export', [EmployeeSpreadsheetController::class, 'export'])->name('employees.export');
+    Route::post('/employees/import', [EmployeeSpreadsheetController::class, 'import'])->name('employees.import');
     Route::resource('employees', EmployeeController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);
     Route::post('/employees/{employee}/status', [EmployeeController::class, 'updateStatus'])->name('employees.status');
     Route::resource('leaves', LeaveRequestController::class)->only(['index', 'create', 'store']);

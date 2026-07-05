@@ -46,6 +46,23 @@
                     </a>
                 @endif
                 @can('manage-employees')
+                    <a href="{{ route('employees.export', request()->query()) }}" class="inline-flex items-center gap-2 rounded-xl border border-outline-variant/60 bg-white px-5 py-3 text-sm font-black text-primary shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-fixed">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        <span>Export Excel</span>
+                    </a>
+                    <form method="POST" action="{{ route('employees.import') }}" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2 rounded-xl border border-outline-variant/60 bg-white p-1.5 shadow-sm">
+                        @csrf
+                        @if($selectedCompanyId)
+                            <input type="hidden" name="company_id" value="{{ $selectedCompanyId }}">
+                        @endif
+                        <label class="cursor-pointer rounded-lg px-3 py-2 text-sm font-black text-on-surface-variant transition hover:bg-surface-container">
+                            <input type="file" name="import_file" accept=".csv,text/csv" class="sr-only" onchange="this.form.submit()">
+                            <span class="inline-flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">upload_file</span>
+                                <span>Import CSV</span>
+                            </span>
+                        </label>
+                    </form>
                     <a href="{{ route('employees.create') }}" class="stitch-btn-primary inline-flex items-center gap-2 px-6 py-3">
                         <span class="material-symbols-outlined">person_add</span>
                         <span>إضافة موظف جديد</span>
