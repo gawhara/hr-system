@@ -311,14 +311,16 @@
             </section>
         @endif
 
-        {{-- ===================== Technical guide (hidden; opened by the help button) ===================== --}}
-        <section class="glass-card rounded-2xl p-6" id="tech-guide" hidden>
+        {{-- ===================== Technical guide (popup, opened by the help button) ===================== --}}
+        <dialog id="tech-guide" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
+                class="m-auto w-[min(92vw,900px)] rounded-3xl border border-outline-variant/40 bg-white p-6 text-on-background shadow-2xl backdrop:bg-black/55 backdrop:backdrop-blur-sm">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="font-headline text-xl font-bold text-on-surface">دليل الربط الفني — ZKTeco</h3>
                 <button type="button" id="guide-close" class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-surface-container" title="إغلاق الدليل">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
+            <div class="max-h-[70vh] overflow-y-auto pe-1">
             <div class="space-y-3">
 
                 <details class="rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-4">
@@ -409,7 +411,8 @@
                     </div>
                 </details>
             </div>
-        </section>
+            </div>
+        </dialog>
     </div>
 
     <script>
@@ -476,20 +479,27 @@
             buttons.forEach((btn) => btn.addEventListener('click', () => selectMethod(btn.dataset.method)));
             selectMethod('lan');
 
-            // Technical guide: hidden by default, opened from the help button.
+            // Technical guide: opens as a modal popup from the help button.
             const guide = document.getElementById('tech-guide');
             const guideToggle = document.getElementById('guide-toggle');
             const guideClose = document.getElementById('guide-close');
 
             if (guide && guideToggle) {
-                guideToggle.addEventListener('click', () => {
-                    guide.hidden = !guide.hidden;
-                    if (!guide.hidden) guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                });
+                guideToggle.addEventListener('click', () => guide.showModal());
             }
 
             if (guide && guideClose) {
-                guideClose.addEventListener('click', () => { guide.hidden = true; });
+                guideClose.addEventListener('click', () => guide.close());
+            }
+
+            // Click on the backdrop (outside the dialog box) closes it.
+            if (guide) {
+                guide.addEventListener('click', (event) => {
+                    const box = guide.getBoundingClientRect();
+                    const outside = event.clientX < box.left || event.clientX > box.right
+                        || event.clientY < box.top || event.clientY > box.bottom;
+                    if (outside) guide.close();
+                });
             }
         })();
     </script>
