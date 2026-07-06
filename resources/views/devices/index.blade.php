@@ -10,20 +10,22 @@
             <div>
                 <p class="font-label text-xs font-bold uppercase tracking-[0.25em] text-tertiary">Biometric Fleet Console</p>
                 <h2 class="mt-2 font-headline text-display-lg font-bold text-primary">أجهزة البصمة</h2>
-                <p class="mt-2 max-w-3xl text-on-surface-variant">
-                    وحدة تشغيل مركزية لأجهزة الحضور في شركات المجموعة الأربع. البروتوكول: ZKTeco عبر
-                    <span dir="ltr" class="font-bold">UDP 4370</span> — يعمل عبر الشبكة المحلية أو VPN أو IP ثابت أو DDNS.
-                    السحب التلقائي يعمل كل 15 دقيقة؛ السجلات اليدوية من HR لا تُستبدل أبداً.
-                </p>
             </div>
-            <form method="POST" action="{{ route('devices.pull-all') }}"
-                  onsubmit="return confirm('سحب البصمات من جميع الأجهزة المفعلة الآن؟\nقد يستغرق حتى 8 ثوانٍ لكل جهاز غير متصل.');">
-                @csrf
-                <button class="stitch-btn-primary flex items-center gap-2 px-6 py-3">
-                    <span class="material-symbols-outlined">cloud_sync</span>
-                    <span>سحب من جميع الأجهزة</span>
+            <div class="flex flex-wrap items-center gap-3">
+                <button type="button" id="guide-toggle"
+                        class="flex items-center gap-2 rounded-xl border border-outline-variant/60 bg-white px-5 py-3 font-bold text-on-surface transition hover:border-primary/40 hover:bg-primary-fixed hover:text-primary">
+                    <span class="material-symbols-outlined">help</span>
+                    <span>دليل الربط الفني</span>
                 </button>
-            </form>
+                <form method="POST" action="{{ route('devices.pull-all') }}"
+                      onsubmit="return confirm('سحب البصمات من جميع الأجهزة المفعلة الآن؟\nقد يستغرق حتى 8 ثوانٍ لكل جهاز غير متصل.');">
+                    @csrf
+                    <button class="stitch-btn-primary flex items-center gap-2 px-6 py-3">
+                        <span class="material-symbols-outlined">cloud_sync</span>
+                        <span>سحب من جميع الأجهزة</span>
+                    </button>
+                </form>
+            </div>
         </div>
 
         {{-- ===================== Fleet stats ===================== --}}
@@ -309,9 +311,14 @@
             </section>
         @endif
 
-        {{-- ===================== Technical guide ===================== --}}
-        <section class="glass-card rounded-2xl p-6">
-            <h3 class="mb-4 font-headline text-xl font-bold text-on-surface">دليل الربط الفني — ZKTeco</h3>
+        {{-- ===================== Technical guide (hidden; opened by the help button) ===================== --}}
+        <section class="glass-card rounded-2xl p-6" id="tech-guide" hidden>
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-headline text-xl font-bold text-on-surface">دليل الربط الفني — ZKTeco</h3>
+                <button type="button" id="guide-close" class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-surface-container" title="إغلاق الدليل">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
             <div class="space-y-3">
 
                 <details class="rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-4">
@@ -468,6 +475,22 @@
 
             buttons.forEach((btn) => btn.addEventListener('click', () => selectMethod(btn.dataset.method)));
             selectMethod('lan');
+
+            // Technical guide: hidden by default, opened from the help button.
+            const guide = document.getElementById('tech-guide');
+            const guideToggle = document.getElementById('guide-toggle');
+            const guideClose = document.getElementById('guide-close');
+
+            if (guide && guideToggle) {
+                guideToggle.addEventListener('click', () => {
+                    guide.hidden = !guide.hidden;
+                    if (!guide.hidden) guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            if (guide && guideClose) {
+                guideClose.addEventListener('click', () => { guide.hidden = true; });
+            }
         })();
     </script>
 @endsection
