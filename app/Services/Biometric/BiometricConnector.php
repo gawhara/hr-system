@@ -13,9 +13,11 @@ use App\Models\BiometricDevice;
 interface BiometricConnector
 {
     /**
-     * Probe the device and return its identity.
+     * Probe the device and return its identity plus its clock time —
+     * attendance accuracy depends on the device clock, so drift must be
+     * visible to the operator.
      *
-     * @return array{serial_number: ?string, device_name: ?string, version: ?string}
+     * @return array{serial_number: ?string, device_name: ?string, version: ?string, device_time: ?string}
      *
      * @throws \RuntimeException when the device is unreachable.
      */

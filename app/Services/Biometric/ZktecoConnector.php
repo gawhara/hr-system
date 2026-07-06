@@ -20,10 +20,19 @@ class ZktecoConnector implements BiometricConnector
         $zk = $this->open($device);
 
         try {
+            $deviceTime = null;
+
+            try {
+                $deviceTime = $this->stringOrNull($zk->getTime());
+            } catch (\Throwable) {
+                // Some firmware refuses CMD_GET_TIME — identity still counts.
+            }
+
             return [
                 'serial_number' => $this->stringOrNull($zk->serialNumber()),
                 'device_name' => $this->stringOrNull($zk->deviceName()),
                 'version' => $this->stringOrNull($zk->version()),
+                'device_time' => $deviceTime,
             ];
         } finally {
             $this->close($zk);

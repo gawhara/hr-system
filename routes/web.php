@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices', [BiometricDeviceController::class, 'index'])->name('devices.index');
     Route::post('/devices', [BiometricDeviceController::class, 'store'])->name('devices.store');
     Route::put('/devices/{device}', [BiometricDeviceController::class, 'update'])->name('devices.update');
+    Route::post('/devices/pull-all', [BiometricDeviceController::class, 'pullAll'])->name('devices.pull-all');
     Route::post('/devices/{device}/test', [BiometricDeviceController::class, 'test'])->name('devices.test');
     Route::post('/devices/{device}/pull', [BiometricDeviceController::class, 'pull'])->name('devices.pull');
     Route::delete('/devices/{device}', [BiometricDeviceController::class, 'destroy'])->name('devices.toggle');

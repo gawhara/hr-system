@@ -25,7 +25,12 @@ class FakeConnector implements BiometricConnector
             throw new \RuntimeException('device unreachable');
         }
 
-        return ['serial_number' => 'ZK-TEST-001', 'device_name' => 'ZKTeco F18', 'version' => '6.60'];
+        return [
+            'serial_number' => 'ZK-TEST-001',
+            'device_name' => 'ZKTeco F18',
+            'version' => '6.60',
+            'device_time' => now()->format('Y-m-d H:i:s'),
+        ];
     }
 
     public function fetchPunches(BiometricDevice $device): array
@@ -198,6 +203,33 @@ class BiometricAttendanceTest extends TestCase
             'current_company_id' => 1,
         ]);
         $this->actingAs($employeeUser)->get(route('devices.index'))->assertForbidden();
+    }
+
+    public function test_pull_all_devices_endpoint_pulls_active_fleet(): void
+    {
+        $this->seed();
+
+        $device = $this->device();
+        $device->update(['is_active' => true]);
+
+        $employee = Employee::where('company_id', 1)->whereNotNull('biometric_user_id')->firstOrFail();
+        $this->fake->punches = [
+            ['device_user_id' => $employee->biometric_user_id, 'punched_at' => Carbon::parse('2026-07-03 08:05'), 'state' => 1, 'punch_type' => 0],
+        ];
+
+        $this->actingAs($this->admin())
+            ->post(route('devices.pull-all'))
+            ->assertRedirect(route('devices.index'))
+            ->assertSessionHas('status');
+
+        $this->assertDatabaseHas('attendance_punches', [
+            'biometric_device_id' => $device->id,
+            'device_user_id' => $employee->biometric_user_id,
+        ]);
+
+        // hr_manager lacks manage-settings.
+        $hr = User::where('email', 'hr1@hr.local')->firstOrFail();
+        $this->actingAs($hr)->post(route('devices.pull-all'))->assertForbidden();
     }
 
     public function test_admin_can_register_device_with_ddns_hostname(): void

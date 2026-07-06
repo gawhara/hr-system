@@ -20,16 +20,38 @@ class BiometricDeviceController extends Controller
             ->with(['branches' => fn ($query) => $query->orderBy('name_ar')])
             ->get();
 
-        $devices = BiometricDevice::with(['company', 'branch'])
+        $allDevices = BiometricDevice::with(['company', 'branch'])
             ->withCount('punches')
             ->orderBy('company_id')
             ->orderBy('name_ar')
+            ->get();
+
+        // Punches the puller couldn't attribute — each row is a device user
+        // id that needs its employee's "رقم المستخدم في جهاز البصمة" filled.
+        $unmatched = \App\Models\AttendancePunch::query()
+            ->whereNull('employee_id')
+            ->selectRaw('biometric_device_id, device_user_id, count(*) as punch_count, max(punched_at) as last_punch_at')
+            ->groupBy('biometric_device_id', 'device_user_id')
+            ->orderByDesc('punch_count')
+            ->limit(20)
             ->get()
-            ->groupBy('company_id');
+            ->each(fn ($row) => $row->setRelation(
+                'device',
+                $allDevices->firstWhere('id', $row->biometric_device_id),
+            ));
 
         return view('devices.index', [
             'companies' => $companies,
-            'devicesByCompany' => $devices,
+            'devicesByCompany' => $allDevices->groupBy('company_id'),
+            'fleet' => [
+                'total' => $allDevices->count(),
+                'active' => $allDevices->where('is_active', true)->count(),
+                'online' => $allDevices->filter(fn ($device) => $device->connectionStatus() === 'online')->count(),
+                'errors' => $allDevices->whereNotNull('last_error')->count(),
+                'punches' => (int) $allDevices->sum('punches_count'),
+                'unmatched' => (int) \App\Models\AttendancePunch::whereNull('employee_id')->count(),
+            ],
+            'unmatched' => $unmatched,
         ]);
     }
 
@@ -68,11 +90,24 @@ class BiometricDeviceController extends Controller
                 'model' => $info['device_name'] ?? $device->model,
             ])->save();
 
-            return redirect()->route('devices.index')->with('status', sprintf(
-                'الاتصال ناجح — %s (الرقم التسلسلي: %s)',
+            $message = sprintf(
+                'الاتصال ناجح — %s | الرقم التسلسلي: %s | الإصدار: %s',
                 $info['device_name'] ?? 'جهاز ZKTeco',
                 $info['serial_number'] ?? 'غير متاح',
-            ));
+                $info['version'] ?? 'غير متاح',
+            );
+
+            // Attendance is only as accurate as the device clock: surface
+            // drift immediately instead of discovering it in payroll.
+            if (! empty($info['device_time'])) {
+                $driftMinutes = (int) round(abs(now()->diffInSeconds(\Illuminate\Support\Carbon::parse($info['device_time']), false)) / 60);
+
+                $message .= $driftMinutes >= 3
+                    ? sprintf(' | ⚠ ساعة الجهاز منحرفة %d دقيقة عن الخادم (%s) — اضبط وقت الجهاز قبل الاعتماد على الحضور.', $driftMinutes, $info['device_time'])
+                    : sprintf(' | ساعة الجهاز مطابقة (%s)', $info['device_time']);
+            }
+
+            return redirect()->route('devices.index')->with('status', $message);
         } catch (\RuntimeException $exception) {
             $device->update(['last_error' => $exception->getMessage()]);
 
@@ -97,6 +132,37 @@ class BiometricDeviceController extends Controller
         } catch (\RuntimeException $exception) {
             return redirect()->route('devices.index')->withErrors(['device' => $exception->getMessage()]);
         }
+    }
+
+    /**
+     * Manual fleet-wide pull (the scheduler also runs one every 15 min).
+     */
+    public function pullAll(Request $request, AttendancePullService $service)
+    {
+        abort_unless($request->user()->can('manage-settings'), 403);
+
+        $results = [];
+        $failures = 0;
+
+        foreach (BiometricDevice::where('is_active', true)->get() as $device) {
+            try {
+                $stats = $service->pullDevice($device);
+                $results[] = sprintf('%s: %d جديد', $device->name_ar, $stats['new']);
+            } catch (\RuntimeException) {
+                $failures++;
+                $results[] = sprintf('%s: تعذر الاتصال', $device->name_ar);
+            }
+        }
+
+        if ($results === []) {
+            return redirect()->route('devices.index')->withErrors(['device' => 'لا توجد أجهزة مفعلة للسحب.']);
+        }
+
+        $summary = 'اكتمل السحب — ' . implode(' | ', $results);
+
+        return $failures === count($results)
+            ? redirect()->route('devices.index')->withErrors(['device' => $summary])
+            : redirect()->route('devices.index')->with('status', $summary);
     }
 
     public function destroy(Request $request, BiometricDevice $device)
