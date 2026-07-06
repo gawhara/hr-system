@@ -7,6 +7,9 @@
         @if(session('status'))
             <div class="rounded-xl bg-surface-container-low px-4 py-3 text-sm font-bold text-primary ring-1 ring-outline-variant">{{ session('status') }}</div>
         @endif
+        @if($errors->any())
+            <div class="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-800">{{ $errors->first() }}</div>
+        @endif
 
         <section class="flex flex-col justify-between gap-4 rounded-3xl border border-outline-variant/50 bg-white p-6 shadow-[0_16px_38px_rgba(25,28,30,0.05)] md:flex-row md:items-end">
             <div>

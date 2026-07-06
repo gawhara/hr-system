@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BiometricDeviceController;
 use App\Http\Controllers\CompanyContextController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
@@ -31,7 +32,8 @@ Route::post('/locale', function (Request $request) {
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
-    Route::post('/login', [AuthController::class, 'store']);
+    // S1: brute-force guard — 5 attempts per minute per IP.
+    Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {
@@ -49,12 +51,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/employees/export', [EmployeeSpreadsheetController::class, 'export'])->name('employees.export');
     Route::get('/employees/import-template', [EmployeeSpreadsheetController::class, 'template'])->name('employees.import-template');
     Route::post('/employees/import', [EmployeeSpreadsheetController::class, 'import'])->name('employees.import');
-    Route::resource('employees', EmployeeController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);
+    Route::resource('employees', EmployeeController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::post('/employees/{employee}/status', [EmployeeController::class, 'updateStatus'])->name('employees.status');
     Route::resource('leaves', LeaveRequestController::class)->only(['index', 'create', 'store']);
     Route::post('/leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
     Route::post('/leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/devices', [BiometricDeviceController::class, 'index'])->name('devices.index');
+    Route::post('/devices', [BiometricDeviceController::class, 'store'])->name('devices.store');
+    Route::put('/devices/{device}', [BiometricDeviceController::class, 'update'])->name('devices.update');
+    Route::post('/devices/{device}/test', [BiometricDeviceController::class, 'test'])->name('devices.test');
+    Route::post('/devices/{device}/pull', [BiometricDeviceController::class, 'pull'])->name('devices.pull');
+    Route::delete('/devices/{device}', [BiometricDeviceController::class, 'destroy'])->name('devices.toggle');
     Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
     Route::get('/employees/{employee}/documents/create', [EmployeeDocumentController::class, 'create'])->name('employees.documents.create');
     Route::post('/employees/{employee}/documents', [EmployeeDocumentController::class, 'store'])->name('employees.documents.store');

@@ -89,6 +89,29 @@ class SyncRegistry
         'contract' => ['basic_salary', 'status', 'terminated_at'],
     ];
 
+    /** @var array<string, array<int, string>> */
+    private static array $writableColumnsCache = [];
+
+    /**
+     * S3 hardening: the applier only ever writes real table columns, minus
+     * local ids/user FKs — client payloads can't smuggle arbitrary keys.
+     */
+    public static function writableColumns(string $type): array
+    {
+        if (! isset(self::$writableColumnsCache[$type])) {
+            $modelClass = self::modelFor($type);
+            $table = (new $modelClass)->getTable();
+
+            self::$writableColumnsCache[$type] = array_values(array_diff(
+                \Illuminate\Support\Facades\Schema::getColumnListing($table),
+                self::LOCAL_ONLY_COLUMNS,
+                ['uuid', 'synced_at'],
+            ));
+        }
+
+        return self::$writableColumnsCache[$type];
+    }
+
     public static function typeFor(Model $model): string
     {
         $type = array_search($model::class, self::MODELS, true);

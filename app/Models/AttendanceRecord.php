@@ -12,7 +12,10 @@ class AttendanceRecord extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'work_date' => 'date',
+        // Y-m-d storage on every driver (SQLite tests store the cast's
+        // serialized string), so plain where('work_date', $date) matches —
+        // no whereDate() wrapper needed, MySQL keeps using the index.
+        'work_date' => 'date:Y-m-d',
     ];
 
     public function employee()

@@ -107,8 +107,13 @@ class DashboardController extends Controller
             'pending_leaves' => LeaveRequest::whereHas('employee', fn ($query) => $query->where('company_id', $company->id))
                 ->where('status', 'pending')
                 ->count(),
-            'monthly_payroll' => PayrollItem::whereHas('employee', fn ($query) => $query->where('company_id', $company->id))
-                ->sum('net_salary'),
+            // B1: the card says "net payroll" for the month — sum only the
+            // latest run, not every payroll item ever created.
+            'monthly_payroll' => ($latestCycleId = \App\Models\PayrollCycle::where('company_id', $company->id)
+                    ->orderByDesc('year')->orderByDesc('month')->orderByDesc('run_sequence')
+                    ->value('id'))
+                ? PayrollItem::where('payroll_cycle_id', $latestCycleId)->sum('net_salary')
+                : 0,
             'document_alerts' => $documentAlerts,
         ];
     }

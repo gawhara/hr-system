@@ -19,6 +19,7 @@ return [
         'payroll' => 'الرواتب',
         'documents' => 'الوثائق',
         'performance' => 'الأداء',
+        'devices' => 'أجهزة البصمة',
         'reports' => 'التقارير',
         'settings' => 'الإعدادات',
         'home' => 'الرئيسية',

@@ -24,7 +24,14 @@ class ReportsController extends Controller
 
         $headcount = (clone $employees)->count();
         $saudis = (clone $employees)->where('saudi_non_saudi', 'saudi')->count();
-        $payroll = PayrollItem::whereHas('employee', fn ($query) => $query->whereIn('company_id', $companyIds));
+        // B1: current payroll = each company's latest cycle only, never the
+        // all-time sum (that number would inflate every month).
+        $latestCycleIds = \App\Models\PayrollCycle::whereIn('company_id', $companyIds)
+            ->orderByDesc('year')->orderByDesc('month')->orderByDesc('run_sequence')
+            ->get(['id', 'company_id'])
+            ->unique('company_id')
+            ->pluck('id');
+        $payroll = PayrollItem::whereIn('payroll_cycle_id', $latestCycleIds);
         $pendingLeaves = LeaveRequest::whereHas('employee', fn ($query) => $query->whereIn('company_id', $companyIds))
             ->where('status', 'pending')
             ->count();

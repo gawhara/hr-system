@@ -13,7 +13,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Biometric protocol boundary — swap the implementation per brand
+        // without touching the pull pipeline (AGENT.md: interface, not
+        // hard dependency).
+        $this->app->bind(
+            \App\Services\Biometric\BiometricConnector::class,
+            \App\Services\Biometric\ZktecoConnector::class,
+        );
     }
 
     /**

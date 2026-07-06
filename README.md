@@ -2,6 +2,23 @@
 
 Arabic-first, offline-ready Laravel HR ERP for a Saudi multi-company group.
 
+## Production / Branch Deployment Checklist
+
+Before running this system anywhere except a local dev machine:
+
+1. `.env`: `APP_DEBUG=false`, `SESSION_ENCRYPT=true`, dedicated MySQL user
+   with a strong password (never root/empty).
+2. Set `HR_SEED_PASSWORD` to a strong value **before** `db:seed`, or change
+   all seeded account passwords immediately after seeding.
+3. Serve over HTTPS only — especially the `/api/sync/*` endpoints; the sync
+   token and PII ciphertext must never cross the network in plaintext.
+4. Use a long random `HR_SYNC_TOKEN`; rotate it if a branch machine is
+   retired or compromised.
+5. Login is rate-limited (5/min per IP) out of the box; keep it behind the
+   VPN/LAN regardless.
+6. Mudad export files contain decrypted IBANs and national IDs — treat the
+   downloaded CSVs as confidential and delete them after upload to Mudad.
+
 ## Offline Strategy — Decision
 
 **Strategy A (branch-local server + central sync)** is the chosen offline

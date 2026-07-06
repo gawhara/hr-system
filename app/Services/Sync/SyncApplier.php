@@ -33,6 +33,13 @@ class SyncApplier
         $modelClass = SyncRegistry::modelFor($record['type']);
         $attributes = $this->resolveForeignKeys($record['type'], $record['attributes']);
 
+        // Never trust the wire: drop anything that isn't a sync-writable
+        // column of this type (ids, user FKs, unknown keys).
+        $attributes = array_intersect_key(
+            $attributes,
+            array_flip(SyncRegistry::writableColumns($record['type'])),
+        );
+
         /** @var Model|null $local */
         $local = $modelClass::withoutGlobalScopes()
             ->when(

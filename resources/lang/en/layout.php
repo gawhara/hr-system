@@ -19,6 +19,7 @@ return [
         'payroll' => 'Payroll',
         'documents' => 'Documents',
         'performance' => 'Performance',
+        'devices' => 'Biometric Devices',
         'reports' => 'Reports',
         'settings' => 'Settings',
         'home' => 'Home',

@@ -62,9 +62,13 @@ class SyncController extends Controller
                     method_exists($modelClass, 'bootSoftDeletes'),
                     fn ($builder) => $builder->withTrashed(),
                 )
-                ->when($since, fn ($builder) => $builder->where('updated_at', '>', $since))
+                // S7: inclusive cursor + id tiebreaker so identical-timestamp
+                // rows at the boundary are never skipped; re-applied rows are
+                // harmless (the applier is idempotent).
+                ->when($since, fn ($builder) => $builder->where('updated_at', '>=', $since))
                 ->orderBy('updated_at')
-                ->limit(500);
+                ->orderBy('id')
+                ->limit(1000);
 
             foreach ($query->get() as $model) {
                 $records[] = SyncRegistry::serialize($model);

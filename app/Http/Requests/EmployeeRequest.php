@@ -51,6 +51,15 @@ class EmployeeRequest extends FormRequest
                 'nullable', 'string', 'max:50',
                 Rule::unique('employees', 'financial_employee_id')->ignore($employee)->withoutTrashed(),
             ],
+            // Enrollment id on the ZK device; punches map to employees by
+            // (device company, this id) — unique inside each company.
+            'biometric_user_id' => [
+                'nullable', 'string', 'max:50',
+                Rule::unique('employees', 'biometric_user_id')
+                    ->where('company_id', (int) $this->input('company_id'))
+                    ->ignore($employee)
+                    ->withoutTrashed(),
+            ],
             'hr_employee_id' => [
                 'nullable', 'string', 'max:50',
                 Rule::unique('employees', 'hr_employee_id')->ignore($employee)->withoutTrashed(),

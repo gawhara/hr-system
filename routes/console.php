@@ -9,6 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('hr:send-expiry-alerts')->dailyAt('07:00');
+Schedule::command('hr:pull-attendance')->everyFifteenMinutes()->withoutOverlapping();
 
 if (config('hr.sync.role') === 'branch') {
     Schedule::command('hr:sync')->everyFifteenMinutes()->withoutOverlapping();

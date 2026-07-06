@@ -58,6 +58,20 @@ class LeaveRequestController extends Controller
         abort_unless($employee->company_id === $request->user()->current_company_id, 403);
         abort_unless($request->user()->isHrAdmin() || $employee->user_id === $request->user()->id, 403);
 
+        // B2: one employee can't hold two overlapping pending/approved leaves.
+        $overlaps = LeaveRequest::where('employee_id', $data['employee_id'])
+            ->whereIn('status', ['pending', 'approved'])
+            ->where('starts_on', '<=', $data['ends_on'])
+            ->where('ends_on', '>=', $data['starts_on'])
+            ->exists();
+
+        if ($overlaps) {
+            return back()
+                ->withInput()
+                ->withErrors(['starts_on' => 'يوجد طلب إجازة آخر (معلق أو معتمد) يتداخل مع هذه الفترة.']);
+        }
+
+        // Calendar days by policy; working-day calendars are a future item.
         $days = now()->parse($data['starts_on'])->diffInDays(now()->parse($data['ends_on'])) + 1;
 
         LeaveRequest::create($data + [
@@ -87,6 +101,19 @@ class LeaveRequestController extends Controller
             ]);
 
             if ($leave->status !== 'approved') {
+                // B2: paid leave must not drive the balance negative silently.
+                $remaining = (float) $balance->entitled_days + (float) $balance->carried_days - (float) $balance->used_days;
+
+                if ($leave->leaveType()->value('is_paid') && $remaining < (float) $leave->days) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'leave' => sprintf(
+                            'رصيد الإجازة غير كافٍ للموافقة: المتبقي %.1f يوم والطلب %.1f يوم.',
+                            $remaining,
+                            (float) $leave->days,
+                        ),
+                    ]);
+                }
+
                 $balance->increment('used_days', $leave->days);
             }
 

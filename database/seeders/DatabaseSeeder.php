@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
         $superAdmin = User::create([
             'name' => 'مدير النظام',
             'email' => 'admin@hr.local',
-            'password' => Hash::make('password'),
+            'password' => Hash::make(env('HR_SEED_PASSWORD', 'password')),
             'role' => 'group_admin',
             'current_company_id' => $companies->first()->id,
         ]);
@@ -79,10 +79,21 @@ class DatabaseSeeder extends Seeder
         $employeeCounter = 1;
 
         foreach ($companies as $companyIndex => $company) {
+            // Demo device rows: inactive placeholders so the scheduled pull
+            // never dials fake addresses — activate real devices from /devices.
+            \App\Models\BiometricDevice::create([
+                'company_id' => $company->id,
+                'name_ar' => 'بصمة الفرع الرئيسي',
+                'name_en' => 'Main Branch Device',
+                'host' => sprintf('192.168.%d.201', 10 + $companyIndex),
+                'port' => 4370,
+                'is_active' => false,
+            ]);
+
             $hrUser = User::create([
                 'name' => 'مسؤول موارد ' . ($companyIndex + 1),
                 'email' => 'hr' . ($companyIndex + 1) . '@hr.local',
-                'password' => Hash::make('password'),
+                'password' => Hash::make(env('HR_SEED_PASSWORD', 'password')),
                 'role' => 'hr_manager',
                 'current_company_id' => $company->id,
             ]);
@@ -122,6 +133,7 @@ class DatabaseSeeder extends Seeder
                     'employee_code' => sprintf('EMP-%03d', $employeeCounter),
                     'financial_employee_id' => sprintf('FIN-%03d', $employeeCounter),
                     'hr_employee_id' => sprintf('HR-%03d', $employeeCounter),
+                    'biometric_user_id' => (string) $employeeCounter,
                     'national_id' => (string) (1000000000 + $employeeCounter),
                     'name_ar' => 'موظف تجريبي ' . $employeeCounter,
                     'name_en' => 'Demo Employee ' . $employeeCounter,

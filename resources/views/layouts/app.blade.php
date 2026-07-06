@@ -25,8 +25,12 @@
                     ['documents.*', 'documents.index', __('layout.nav.documents'), 'description'],
                     ['performance.*', 'performance.index', __('layout.nav.performance'), 'monitoring'],
                     ['reports.*', 'reports.index', __('layout.nav.reports'), 'bar_chart'],
-                    ['settings.*', 'dashboard', __('layout.nav.settings'), 'settings'],
                 ]);
+            }
+
+            if ($user->can('manage-settings')) {
+                $navLinks[] = ['devices.*', 'devices.index', __('layout.nav.devices'), 'fingerprint'];
+                $navLinks[] = ['settings.*', 'dashboard', __('layout.nav.settings'), 'settings'];
             }
         @endphp
 

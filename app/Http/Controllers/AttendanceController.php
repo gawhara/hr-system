@@ -12,10 +12,13 @@ class AttendanceController extends Controller
     {
         $user = $request->user();
         $companyId = $request->user()->current_company_id;
-        $date = $request->query('date', now()->toDateString());
+        // S8: malformed ?date= must 422, not 500 deep inside the query.
+        $date = $request->validate(['date' => ['nullable', 'date_format:Y-m-d']])['date']
+            ?? now()->toDateString();
 
+        // work_date is a DATE column — plain where() keeps the index usable.
         $records = AttendanceRecord::with(['employee.department', 'employee.branch'])
-            ->whereDate('work_date', $date)
+            ->where('work_date', $date)
             ->whereHas('employee', fn ($query) => $query->where('company_id', $companyId))
             ->when(! $user->isHrAdmin(), fn ($query) => $query->whereHas('employee', fn ($employeeQuery) => $employeeQuery->where('user_id', $user->id)))
             ->orderBy('work_date')
@@ -24,7 +27,7 @@ class AttendanceController extends Controller
 
         $employees = Employee::where('company_id', $companyId)
             ->when(! $user->isHrAdmin(), fn ($query) => $query->where('user_id', $user->id));
-        $attendanceRecords = AttendanceRecord::whereDate('work_date', $date)
+        $attendanceRecords = AttendanceRecord::where('work_date', $date)
             ->whereHas('employee', fn ($query) => $query->where('company_id', $companyId)
                 ->when(! $user->isHrAdmin(), fn ($employeeQuery) => $employeeQuery->where('user_id', $user->id)));
 

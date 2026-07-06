@@ -175,6 +175,19 @@ class EmployeeController extends Controller
             ->with('status', 'تم تحديث بيانات الموظف بنجاح.');
     }
 
+    public function destroy(Request $request, Employee $employee)
+    {
+        // FR-005: deleting an employee file is group-admin-only and always a
+        // soft delete — the row and its audit trail stay recoverable.
+        abort_unless($request->user()->isGroupAdmin(), 403);
+
+        $employee->delete();
+
+        return redirect()
+            ->route('employees.index', ['company_id' => $employee->company_id])
+            ->with('status', 'تم حذف ملف الموظف (حذف منطقي قابل للاستعادة من قاعدة البيانات).');
+    }
+
     private function formOptions(Request $request): array
     {
         $user = $request->user();

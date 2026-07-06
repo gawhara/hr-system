@@ -35,5 +35,23 @@
                 </div>
             </div>
         </form>
+
+        @if(auth()->user()->isGroupAdmin())
+            <section class="rounded-2xl border border-red-200 bg-red-50/60 p-5">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h3 class="font-bold text-red-800">حذف ملف الموظف</h3>
+                        <p class="mt-1 text-sm text-red-700">حذف منطقي فقط — يبقى السجل وسجل التدقيق قابلين للاستعادة. هذا الإجراء متاح لمدير المجموعة فقط.</p>
+                    </div>
+                    <form method="POST" action="{{ route('employees.destroy', $employee) }}"
+                          onsubmit="return confirm('تأكيد حذف ملف الموظف {{ $employee->name_ar }}؟
+سيُخفى من جميع القوائم ويمكن استعادته من قاعدة البيانات.');">
+                        @csrf
+                        @method('DELETE')
+                        <button class="rounded-xl border border-red-300 bg-white px-6 py-3 text-sm font-bold text-red-700 transition hover:bg-red-100">حذف الموظف</button>
+                    </form>
+                </div>
+            </section>
+        @endif
     </div>
 @endsection

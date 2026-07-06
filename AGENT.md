@@ -664,6 +664,40 @@ Architecture-consistent decisions made during the build, newest batch
 first. Follow these patterns when extending the system; don't reinvent
 them per module.
 
+### 2026-07-06 — ANALYSIS.md remediation (security + correctness)
+
+Applied from the external technical analysis (`ANALYSIS.md`):
+
+* **S1** — `POST /login` is throttled (`throttle:5,1`); seeded demo
+passwords now come from `HR_SEED_PASSWORD` env (default `password` for
+dev/tests — MUST be overridden before seeding a real deployment).
+* **S3** — `SyncApplier` filters incoming attributes against
+`SyncRegistry::writableColumns()` (real table columns minus
+`LOCAL_ONLY_COLUMNS`, `uuid`, `synced_at`). A hostile/compromised branch
+token can no longer set ids, user FKs, or unknown columns via push.
+* **S4** — `.env.example` carries production warnings inline; README has
+a "Production / Branch Deployment Checklist" (debug off, DB user,
+HTTPS-only sync, seed password, Mudad file handling).
+* **S7** — sync pull cursor is inclusive (`updated_at >=`) with an `id`
+tiebreaker and limit 1000; boundary rows are never skipped, and
+re-applied duplicates are harmless because the applier is idempotent.
+* **S8** — `/attendance?date=` is validated (`Y-m-d`); `whereDate()`
+replaced with plain `where()` on the already-DATE `work_date` column so
+the index stays usable.
+* **B1** — dashboard `monthly_payroll` and the reports payroll metric sum
+only each company's **latest** payroll cycle (year/month/run_sequence
+ordering), not all items ever.
+* **B2** — leave store rejects overlapping pending/approved requests;
+approval of **paid** leave types is blocked when the remaining balance
+(entitled + carried − used) is insufficient. Leave days remain calendar
+days by policy; a working-days/holiday calendar is a future item.
+* **FR-005** — `DELETE /employees/{id}` exists: group-admin-only soft
+delete with a danger-zone confirm on the edit page.
+* **Deferred knowingly** (recorded, not forgotten): per-branch sync
+tokens/identities (S2), Policy-class refactor, spatie-only role
+consolidation, branch/department-scoped roles, normalized salary tables,
+assets module, working-day calendars, avatars, bulk list actions.
+
 ### 2026-07-05 — Employee PRD closure audit + native spreadsheet import/export
 
 Employee Module PRD audit outcome after implementing the spreadsheet

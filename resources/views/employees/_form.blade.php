@@ -52,6 +52,10 @@
             <input name="hr_employee_id" value="{{ old('hr_employee_id', $employee->hr_employee_id) }}" class="{{ $fieldClass }}" dir="ltr">
         </div>
         <div>
+            <label class="{{ $labelClass }}">رقم المستخدم في جهاز البصمة</label>
+            <input name="biometric_user_id" value="{{ old('biometric_user_id', $employee->biometric_user_id) }}" class="{{ $fieldClass }}" dir="ltr" inputmode="numeric" placeholder="مثال: 1024">
+        </div>
+        <div>
             <label class="{{ $labelClass }}">رقم الهوية / الإقامة</label>
             <input name="national_id" value="{{ old('national_id', $employee->national_id) }}" class="{{ $fieldClass }}" dir="ltr" maxlength="10" inputmode="numeric">
         </div>

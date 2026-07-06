@@ -17,6 +17,9 @@
             </div>
             <form method="POST" action="{{ route('leaves.store') }}" class="space-y-5 p-6">
                 @csrf
+                @if($errors->any())
+                    <div class="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-800">{{ $errors->first() }}</div>
+                @endif
                 <div>
                     <label class="mb-2 block text-xs font-bold text-on-surface-variant">الموظف</label>
                     <select name="employee_id" class="stitch-input w-full px-3 py-3" required>
